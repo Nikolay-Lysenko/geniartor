@@ -1,7 +1,6 @@
 -c constraints.txt
 numpy==1.18.5
+optimiser==0.1.1
 pretty-midi==0.2.9
 PyYAML==5.3.1
 sinethesizer==0.2.9
-tensorflow==2.2.0
-
