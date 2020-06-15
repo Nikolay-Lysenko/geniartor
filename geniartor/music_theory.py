@@ -5,7 +5,6 @@ Author: Nikolay Lysenko
 """
 
 
-from math import floor
 from typing import List, NamedTuple
 
 from sinethesizer.io.utils import get_note_to_position_mapping
@@ -75,24 +74,3 @@ def slice_scale(
     max_pos = NOTE_TO_POSITION[highest_note]
     res = [x for x in scale if min_pos <= x.position_in_semitones <= max_pos]
     return res
-
-
-def find_strong_beat_events(durations: List[float]) -> List[bool]:
-    """
-    Find events that start on a strong beat (for 4/4 meter).
-
-    :param durations:
-        durations of successive events in fractions of whole measure
-    :return:
-        list of indicators whether corresponding event starts on a strong beat
-    """
-    results = []
-    cumulative_duration = 0
-    for duration in durations:
-        current_duration = cumulative_duration - floor(cumulative_duration)
-        if current_duration == 0 or current_duration == 0.5:
-            results.append(True)
-        else:
-            results.append(False)
-        current_duration += duration
-    return results

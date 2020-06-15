@@ -12,7 +12,6 @@ import numpy as np
 from .music_theory import (
     ScaleElement,
     create_diatonic_scale,
-    find_strong_beat_events,
     slice_scale,
 )
 
@@ -57,8 +56,6 @@ class Piece:
         scale = create_diatonic_scale(self.tonic, self.scale_type)
         self.pitches = slice_scale(scale, self.lowest_note, self.highest_note)
         self.roll_shape = (len(self.pitches), len(self.sonorities_durations))
-        self.strong_beats = find_strong_beat_events(self.sonorities_durations)
-
         self.raw_roll = None
         self.sonorities = None
         self.melodic_parts = None
