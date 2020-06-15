@@ -1,5 +1,5 @@
 # Geniartor
 
-Generation of musical phrases with a neural network trained without any datasets.
+Generation of musical phrases that receive maximum score according to configurable evaluational criteria.
 
-Coming soon.
+Coming soon...
