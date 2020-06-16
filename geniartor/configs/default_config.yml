@@ -50,16 +50,7 @@ rendering:
     timbre: default_timbre
     volume: 0.3
 optimization:
-  population_size: 200
-  elite_fraction: 0.1
-  smoothing_coef: 0.25
-  std: 0.3
-  n_trials: 1
-  aggregation_fn: mean
-  parallelling_params:
-    n_processes:
-    max_tasks_per_child: 1
-  verbose: True
+  n_passes: 5
 evaluation:
   scoring_coefs:
     dissipation_of_tension: 1

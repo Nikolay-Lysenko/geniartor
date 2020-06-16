@@ -17,7 +17,7 @@ with open(os.path.join(current_dir, 'README.md'), encoding='utf-8') as f:
 
 setup(
     name='geniartor',
-    version='0.0.1',
+    version='0.1.0',
     description=description,
     long_description=long_description,
     long_description_content_type='text/markdown',
@@ -39,8 +39,6 @@ setup(
     },
     python_requires='>=3.6',
     install_requires=[
-        'numpy',
-        'optimiser',
         'pretty-midi',
         'PyYAML',
         'sinethesizer',
