@@ -72,7 +72,7 @@ def main() -> None:
     default_config_path = resource_filename(__name__, default_config_path)
     config_path = cli_args.config_path or default_config_path
     with open(config_path) as config_file:
-        settings = yaml.safe_load(config_file)
+        settings = yaml.load(config_file, Loader=yaml.FullLoader)
 
     piece = Piece(**settings['piece'])
     initial_mean = np.zeros(piece.roll_shape)

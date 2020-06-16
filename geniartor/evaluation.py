@@ -7,7 +7,7 @@ Author: Nikolay Lysenko
 
 from itertools import combinations
 from math import floor
-from typing import Any, Callable, Dict, List
+from typing import Any, Callable, Dict, List, Tuple
 
 from .music_theory import ScaleElement
 from .piece import Piece
@@ -85,6 +85,67 @@ def evaluate_dissipation_of_tension(
     return score
 
 
+def compute_melodic_fluency_for_one_step(
+        first_sonority: List[ScaleElement],
+        second_sonority: List[ScaleElement],
+        forces_between_degrees: Dict[Tuple[int, int], float],
+        tolerance: float
+) -> float:
+    """
+    Evaluate melodic fluency between two successive sonorities.
+
+    :param first_sonority:
+        first sonority
+    :param second_sonority:
+        second sonority
+    :param forces_between_degrees:
+        mapping from a pair of scale degrees to an imaginary force that pushes
+        from the first degree to the second degree
+    :param tolerance:
+        threshold for negative values of total force
+    :return:
+        force between two successive sonorities
+    """
+    total_force = 0
+    zipped = zip(first_sonority, second_sonority)
+    for first_element, second_element in zipped:
+        degrees = (first_element.degree, second_element.degree)
+        total_force += forces_between_degrees[degrees]
+    total_force /= len(first_sonority)
+    if tolerance <= total_force < 0:
+        total_force = 0
+    return total_force
+
+
+def evaluate_melodic_fluency(
+        piece: Piece,
+        forces_between_degrees: Dict[Tuple[int, int], float],
+        tolerance: float
+) -> float:
+    """
+    Evaluate melodic fluency.
+
+    :param piece:
+        `Piece` instance
+    :param forces_between_degrees:
+        mapping from a pair of scale degrees to an imaginary force that pushes
+        from the first degree to the second degree
+    :param tolerance:
+        threshold for negative values of total force
+    :return:
+        score which is between -1 and 1
+    """
+    score = 0
+    zipped = zip(piece.sonorities, piece.sonorities[1:])
+    for previous_sonority, current_sonority in zipped:
+        score += compute_melodic_fluency_for_one_step(
+            previous_sonority, current_sonority,
+            forces_between_degrees, tolerance
+        )
+    score /= len(piece.sonorities[1:])
+    return score
+
+
 def get_scoring_functions_registry() -> Dict[str, Callable]:
     """
     Get mapping from names of scoring functions to scoring functions.
@@ -93,7 +154,8 @@ def get_scoring_functions_registry() -> Dict[str, Callable]:
         registry of scoring functions
     """
     registry = {
-        'dissipation_of_tension': evaluate_dissipation_of_tension
+        'dissipation_of_tension': evaluate_dissipation_of_tension,
+        'melodic_fluency': evaluate_melodic_fluency,
     }
     return registry
 
