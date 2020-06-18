@@ -1,5 +1,5 @@
 """
-Define data structures representing a musical piece.
+Define data structure representing a musical piece.
 
 Author: Nikolay Lysenko
 """
@@ -15,7 +15,7 @@ from .music_theory import (
 
 
 class Piece:
-    """A musical piece stored in multiple formats."""
+    """A musical piece with plain texture and without chromaticism."""
 
     def __init__(
             self,
@@ -51,7 +51,6 @@ class Piece:
         self.highest_note = highest_note
         self.sonorities_durations = sonorities_durations
 
-        # TODO: Does this class needed or it can be replaced with `NamedTuple`?
         scale = create_diatonic_scale(self.tonic, self.scale_type)
         self.pitches = slice_scale(scale, self.lowest_note, self.highest_note)
         self.sonorities = [
