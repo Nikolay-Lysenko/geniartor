@@ -18,7 +18,18 @@ def update_one_sonority(
         result: Dict[str, Any], sonority_position: int,
         evaluation_params: Dict[str, Any]
 ) -> Dict[str, Any]:
-    """"""
+    """
+    Replace particular sonority with locally the best one.
+
+    :param result:
+        `Piece` instance and its evaluation score
+    :param sonority_position:
+        index of sonority to be updated
+    :param evaluation_params:
+        settings of piece evaluation
+    :return:
+        piece with one modified sonority
+    """
     piece = deepcopy(result['piece'])
     alternatives = itertools.combinations(piece.pitches, piece.n_voices)
     for alternative_sonority in alternatives:
@@ -30,7 +41,17 @@ def update_one_sonority(
 
 
 def perturb(piece: Piece, perturbation_probability: float) -> Piece:
-    """"""
+    """
+    Replace some sonorities with random sonorities.
+
+    :param piece:
+        `Piece` instance
+    :param perturbation_probability:
+        probability to replace sonority with a random sonority during
+        perturbation stage
+    :return:
+        altered piece
+    """
     weights = [perturbation_probability, 1 - perturbation_probability]
     new_sonorities = []
     for sonority in piece.sonorities:
@@ -51,7 +72,21 @@ def run_variable_neighborhood_search(
         piece: Piece, evaluation_params: Dict[str, Any],
         n_passes: int, perturbation_probability: float
 ) -> Piece:
-    """"""
+    """
+    Run Variable Neighborhood Search in order to find optimal piece.
+
+    :param piece:
+        random initial piece
+    :param evaluation_params:
+        settings of piece evaluation
+    :param n_passes:
+        number of passes through all neighborhoods
+    :param perturbation_probability:
+        probability to replace sonority with a random sonority during
+        perturbation stage
+    :return:
+        found piece
+    """
     initial_score = evaluate(piece, **evaluation_params)
     best_result = {'piece': deepcopy(piece), 'score': initial_score}
     previous_result = {'piece': deepcopy(piece), 'score': initial_score}
