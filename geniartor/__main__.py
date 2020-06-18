@@ -11,7 +11,7 @@ from pkg_resources import resource_filename
 
 import yaml
 
-from .optimization import find_optimum_piece
+from .optimization import run_variable_neighborhood_search
 from .piece import Piece
 from .rendering import render
 
@@ -47,7 +47,7 @@ def main() -> None:
         settings = yaml.load(config_file, Loader=yaml.FullLoader)
 
     piece = Piece(**settings['piece'])
-    piece = find_optimum_piece(
+    piece = run_variable_neighborhood_search(
         piece, settings['evaluation'], **settings['optimization']
     )
 
