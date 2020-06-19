@@ -15,6 +15,37 @@ from .piece import Piece
 N_SEMITONES_PER_OCTAVE = 12
 
 
+def evaluate_conjunct_motion(
+        piece: Piece, penalty_deduction_per_line: float,
+        n_semitones_to_penalty: Dict[int, float]
+) -> float:
+    """
+    Evaluate presence of coherent melodic lines that move without leaps.
+
+    :param piece:
+        `Piece` instance
+    :param penalty_deduction_per_line:
+        amount of leaps penalty that is deducted for each melodic line
+    :param n_semitones_to_penalty:
+        mapping from size of melodic interval in semitones to penalty for it
+    :return:
+        score between -1 and 0
+    """
+    score = 0
+    for line in piece.melodic_lines:
+        curr_score = 0
+        for first, second in zip(line, line[1:]):
+            melodic_interval = abs(
+                first.position_in_semitones - second.position_in_semitones
+            )
+            curr_score -= n_semitones_to_penalty.get(melodic_interval, 1.0)
+        curr_score = min(curr_score + penalty_deduction_per_line, 0)
+        curr_score /= (len(line) - 1)
+        score += curr_score
+    score /= piece.n_voices
+    return score
+
+
 def compute_harmonic_stability_of_sonority(
         sonority: List[ScaleElement],
         n_semitones_to_stability: Dict[int, float]
@@ -127,6 +158,7 @@ def get_scoring_functions_registry() -> Dict[str, Callable]:
         registry of scoring functions
     """
     registry = {
+        'conjunct_motion': evaluate_conjunct_motion,
         'harmonic_stability': evaluate_harmonic_stability,
         'tonal_stability': evaluate_tonal_stability,
     }

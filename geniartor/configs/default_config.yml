@@ -50,13 +50,30 @@ rendering:
     timbre: default_timbre
     volume: 0.3
 optimization:
-  n_passes: 2
+  n_passes: 3
   perturbation_probability: 0.3
 evaluation:
   scoring_coefs:
+    conjunct_motion: 1
     harmonic_stability: 1
     tonal_stability: 1
   scoring_fn_params:
+    conjunct_motion:
+      penalty_deduction_per_line: 1.0
+      n_semitones_to_penalty:
+        0: 0.2
+        1: 0.0
+        2: 0.0
+        3: 0.1
+        4: 0.2
+        5: 0.3
+        6: 0.4
+        7: 0.5
+        8: 0.6
+        9: 0.7
+        10: 0.8
+        11: 0.9
+        12: 1.0
     harmonic_stability:
       min_stabilities:
         beginning: 0.8
@@ -80,7 +97,7 @@ evaluation:
     tonal_stability:
       min_stabilities:
         beginning: 0.7
-        ending: 0.8
+        ending: 0.9
         downbeat: 0.7
         middle: 0.5
         other: 0.2
