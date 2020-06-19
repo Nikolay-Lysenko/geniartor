@@ -9,8 +9,10 @@ import random
 from typing import List
 
 from .music_theory import (
+    ScaleElement,
     create_diatonic_scale,
-    slice_scale,
+    label_positions_of_events,
+    slice_scale
 )
 
 
@@ -60,3 +62,18 @@ class Piece:
             )
             for _ in self.sonorities_durations
         ]
+        self.position_types = label_positions_of_events(sonorities_durations)
+
+    @property
+    def melodic_lines(self) -> List[List[ScaleElement]]:
+        """
+        Represent a piece as a list of melodic lines (voices).
+
+        :return:
+            list of voices
+        """
+        melodic_lines = []
+        for i in range(self.n_voices):
+            melodic_line = [sonority[i] for sonority in self.sonorities]
+            melodic_lines.append(melodic_line)
+        return melodic_lines

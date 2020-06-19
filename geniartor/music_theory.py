@@ -5,6 +5,7 @@ Author: Nikolay Lysenko
 """
 
 
+from math import floor
 from typing import List, NamedTuple
 
 from sinethesizer.io.utils import get_note_to_position_mapping
@@ -74,3 +75,23 @@ def slice_scale(
     max_pos = NOTE_TO_POSITION[highest_note]
     res = [x for x in scale if min_pos <= x.position_in_semitones <= max_pos]
     return res
+
+
+def label_positions_of_events(durations: List[float]) -> List[str]:
+    """
+    Label positions of events with their type.
+
+    :param durations:
+        durations of successive events in fractions of whole measure
+    :return:
+        list of types of events positions
+    """
+    labels = ['beginning']
+    current_time = durations[0]
+    types = {0.0: 'downbeat', 0.5: 'middle'}
+    for duration in durations[1:-1]:
+        time_since_last_downbeat = current_time - floor(current_time)
+        labels.append(types.get(time_since_last_downbeat, 'other'))
+        current_time += duration
+    labels.append('ending')
+    return labels

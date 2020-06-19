@@ -23,14 +23,10 @@ def parse_cli_args() -> argparse.Namespace:
     :return:
         namespace with arguments
     """
-    parser = argparse.ArgumentParser(description='Music composition with RL')
+    parser = argparse.ArgumentParser(description='Music composition with VNS')
     parser.add_argument(
         '-c', '--config_path', type=str, default=None,
         help='path to configuration file'
-    )
-    parser.add_argument(
-        '-p', '--populations', type=int, default=100,
-        help='number of populations for search of best piece'
     )
     cli_args = parser.parse_args()
     return cli_args

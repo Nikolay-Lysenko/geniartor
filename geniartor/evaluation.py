@@ -6,8 +6,7 @@ Author: Nikolay Lysenko
 
 
 from itertools import combinations
-from math import floor
-from typing import Any, Callable, Dict, List, Tuple
+from typing import Any, Callable, Dict, List
 
 from .music_theory import ScaleElement
 from .piece import Piece
@@ -16,7 +15,7 @@ from .piece import Piece
 N_SEMITONES_PER_OCTAVE = 12
 
 
-def compute_stability_of_sonority(
+def compute_harmonic_stability_of_sonority(
         sonority: List[ScaleElement],
         n_semitones_to_stability: Dict[int, float]
 ) -> float:
@@ -26,7 +25,7 @@ def compute_stability_of_sonority(
     :param sonority:
         simultaneously sounding pitches
     :param n_semitones_to_stability:
-        mapping from interval size in semitones to its stability
+        mapping from interval size in semitones to its harmonic stability
     :return:
         stability of sonority (a number from 0 to 1)
     """
@@ -43,106 +42,80 @@ def compute_stability_of_sonority(
     return stability
 
 
-def evaluate_dissipation_of_tension(
-        piece: Piece, beat_weights: Dict[float, float],
+def evaluate_harmonic_stability(
+        piece: Piece, min_stabilities: Dict[str, float],
         n_semitones_to_stability: Dict[int, float]
 ) -> float:
     """
-    Evaluate dissipation of harmonic tension on strong beats.
+    Evaluate deviation of actual harmonic stability from its desired level.
 
     :param piece:
         `Piece` instance
-    :param beat_weights:
-        mapping from time interval (in fractions of whole measure)
-        between start of current measure and start of current sonority
-        to a weight of the current measure
+    :param min_stabilities:
+        mapping from type of sonority's start position to minimum
+        sufficient stability
     :param n_semitones_to_stability:
-        mapping from interval size in semitones to its stability
+        mapping from interval size in semitones to its harmonic stability
     :return:
-        score which is between -1 and 1
+        average over all sonorities lack of stability, a score between -1 and 0
     """
     score = 0
-    sum_of_weights = 0
-    current_time = 0
-    stability_of_previous_sonority = 0
-    zipped = zip(piece.sonorities, piece.sonorities_durations)
-    for sonority, duration in zipped:
-        stability_of_current_sonority = compute_stability_of_sonority(
+    zipped = zip(piece.sonorities, piece.position_types)
+    for sonority, position_type in zipped:
+        stability_of_current_sonority = compute_harmonic_stability_of_sonority(
             sonority, n_semitones_to_stability
         )
-        time_since_last_downbeat = current_time - floor(current_time)
-        if time_since_last_downbeat in beat_weights:
-            weight = beat_weights[time_since_last_downbeat]
-            dissipation_of_tension = (
-                stability_of_current_sonority
-                - stability_of_previous_sonority
-            )
-            score += weight * dissipation_of_tension
-            sum_of_weights += weight
-        current_time += duration
-        stability_of_previous_sonority = stability_of_current_sonority
-    score /= sum_of_weights
+        sufficient_stability = min_stabilities[position_type]
+        score += min(stability_of_current_sonority - sufficient_stability, 0)
+    score /= len(piece.sonorities)
     return score
 
 
-def compute_melodic_fluency_for_one_step(
-        first_sonority: List[ScaleElement],
-        second_sonority: List[ScaleElement],
-        forces_between_degrees: Dict[Tuple[int, int], float],
-        tolerance: float
+def compute_tonal_stability_of_sonority(
+        sonority: List[ScaleElement],
+        degree_to_stability: Dict[int, float]
 ) -> float:
     """
-    Evaluate melodic fluency between two successive sonorities.
+    Compute stability of sonority as average stability of pitches forming it.
 
-    :param first_sonority:
-        first sonority
-    :param second_sonority:
-        second sonority
-    :param forces_between_degrees:
-        mapping from a pair of scale degrees to an imaginary force that pushes
-        from the first degree to the second degree
-    :param tolerance:
-        threshold for negative values of total force
+    :param sonority:
+        simultaneously sounding pitches
+    :param degree_to_stability:
+        mapping from scale degree to its tonal stability
     :return:
-        force between two successive sonorities
+        stability of sonority (a number from 0 to 1)
     """
-    total_force = 0
-    zipped = zip(first_sonority, second_sonority)
-    for first_element, second_element in zipped:
-        degrees = (first_element.degree, second_element.degree)
-        total_force += forces_between_degrees[degrees]
-    total_force /= len(first_sonority)
-    if tolerance <= total_force < 0:
-        total_force = 0
-    return total_force
+    stability = sum(degree_to_stability[x.degree] for x in sonority)
+    stability /= len(sonority)
+    return stability
 
 
-def evaluate_melodic_fluency(
-        piece: Piece,
-        forces_between_degrees: Dict[Tuple[int, int], float],
-        tolerance: float
+def evaluate_tonal_stability(
+        piece: Piece, min_stabilities: Dict[str, float],
+        degree_to_stability: Dict[int, float]
 ) -> float:
     """
-    Evaluate melodic fluency.
+    Evaluate deviation of actual tonal stability from its desired level.
 
     :param piece:
         `Piece` instance
-    :param forces_between_degrees:
-        mapping from a pair of scale degrees to an imaginary force that pushes
-        from the first degree to the second degree
-    :param tolerance:
-        threshold for negative values of total force
+    :param min_stabilities:
+        mapping from type of sonority's start position to minimum
+        sufficient stability
+    :param degree_to_stability:
+        mapping from scale degree to its tonal stability
     :return:
-        score which is between -1 and 1
+        average over all sonorities lack of stability, a score between -1 and 0
     """
     score = 0
-    zipped = zip(piece.sonorities, piece.sonorities[1:])
-    for previous_sonority, current_sonority in zipped:
-        score += compute_melodic_fluency_for_one_step(
-            previous_sonority, current_sonority,
-            forces_between_degrees, tolerance
+    zipped = zip(piece.sonorities, piece.position_types)
+    for sonority, position_type in zipped:
+        stability_of_current_sonority = compute_tonal_stability_of_sonority(
+            sonority, degree_to_stability
         )
-    score /= len(piece.sonorities[1:])
+        sufficient_stability = min_stabilities[position_type]
+        score += min(stability_of_current_sonority - sufficient_stability, 0)
+    score /= len(piece.sonorities)
     return score
 
 
@@ -154,8 +127,8 @@ def get_scoring_functions_registry() -> Dict[str, Callable]:
         registry of scoring functions
     """
     registry = {
-        'dissipation_of_tension': evaluate_dissipation_of_tension,
-        'melodic_fluency': evaluate_melodic_fluency,
+        'harmonic_stability': evaluate_harmonic_stability,
+        'tonal_stability': evaluate_tonal_stability,
     }
     return registry
 
