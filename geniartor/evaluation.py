@@ -8,11 +8,32 @@ Author: Nikolay Lysenko
 from itertools import combinations
 from typing import Any, Callable, Dict, List
 
-from .music_theory import ScaleElement
-from .piece import Piece
+from .piece import Piece, PieceElement, convert_sonority_to_its_elements
 
 
 N_SEMITONES_PER_OCTAVE = 12
+
+
+def evaluate_absence_of_voice_crossing(piece: Piece) -> float:
+    """
+    Evaluate absence of voice crossing.
+
+    :param piece:
+        `Piece` instance
+    :return:
+        fraction of sonorities with voices in wrong order
+    """
+    score = 0
+    for sonority in piece.sonorities:
+        sonority_elements = convert_sonority_to_its_elements(
+            sonority, piece.melodic_lines
+        )
+        for first, second in zip(sonority_elements, sonority_elements[1:]):
+            if first.position_in_semitones >= second.position_in_semitones:
+                score -= 1
+                break
+    score /= len(piece.sonorities)
+    return score
 
 
 def evaluate_conjunct_motion(
@@ -42,18 +63,18 @@ def evaluate_conjunct_motion(
         curr_score = min(curr_score + penalty_deduction_per_line, 0)
         curr_score /= (len(line) - 1)
         score += curr_score
-    score /= piece.n_voices
+    score /= len(piece.melodic_lines)
     return score
 
 
 def compute_harmonic_stability_of_sonority(
-        sonority: List[ScaleElement],
+        sonority_elements: List[PieceElement],
         n_semitones_to_stability: Dict[int, float]
 ) -> float:
     """
     Compute stability of sonority as average stability of intervals forming it.
 
-    :param sonority:
+    :param sonority_elements:
         simultaneously sounding pitches
     :param n_semitones_to_stability:
         mapping from interval size in semitones to its harmonic stability
@@ -61,14 +82,13 @@ def compute_harmonic_stability_of_sonority(
         stability of sonority (a number from 0 to 1)
     """
     stability = 0
-    for first_element, second_element in combinations(sonority, 2):
+    for first, second in combinations(sonority_elements, 2):
         interval_in_semitones = abs(
-            first_element.position_in_semitones
-            - second_element.position_in_semitones
+            first.position_in_semitones - second.position_in_semitones
         )
         interval_in_semitones %= N_SEMITONES_PER_OCTAVE
         stability += n_semitones_to_stability[interval_in_semitones]
-    n_pairs = len(sonority) * (len(sonority) - 1) / 2
+    n_pairs = len(sonority_elements) * (len(sonority_elements) - 1) / 2
     stability /= n_pairs
     return stability
 
@@ -91,33 +111,35 @@ def evaluate_harmonic_stability(
         average over all sonorities lack of stability, a score between -1 and 0
     """
     score = 0
-    zipped = zip(piece.sonorities, piece.position_types)
-    for sonority, position_type in zipped:
-        stability_of_current_sonority = compute_harmonic_stability_of_sonority(
-            sonority, n_semitones_to_stability
+    for sonority in piece.sonorities:
+        sonority_elements = convert_sonority_to_its_elements(
+            sonority, piece.melodic_lines
         )
-        sufficient_stability = min_stabilities[position_type]
+        stability_of_current_sonority = compute_harmonic_stability_of_sonority(
+            sonority_elements, n_semitones_to_stability
+        )
+        sufficient_stability = min_stabilities[sonority.position_type]
         score += min(stability_of_current_sonority - sufficient_stability, 0)
     score /= len(piece.sonorities)
     return score
 
 
 def compute_tonal_stability_of_sonority(
-        sonority: List[ScaleElement],
+        sonority_elements: List[PieceElement],
         degree_to_stability: Dict[int, float]
 ) -> float:
     """
     Compute stability of sonority as average stability of pitches forming it.
 
-    :param sonority:
+    :param sonority_elements:
         simultaneously sounding pitches
     :param degree_to_stability:
         mapping from scale degree to its tonal stability
     :return:
         stability of sonority (a number from 0 to 1)
     """
-    stability = sum(degree_to_stability[x.degree] for x in sonority)
-    stability /= len(sonority)
+    stability = sum(degree_to_stability[x.degree] for x in sonority_elements)
+    stability /= len(sonority_elements)
     return stability
 
 
@@ -139,12 +161,14 @@ def evaluate_tonal_stability(
         average over all sonorities lack of stability, a score between -1 and 0
     """
     score = 0
-    zipped = zip(piece.sonorities, piece.position_types)
-    for sonority, position_type in zipped:
-        stability_of_current_sonority = compute_tonal_stability_of_sonority(
-            sonority, degree_to_stability
+    for sonority in piece.sonorities:
+        sonority_elements = convert_sonority_to_its_elements(
+            sonority, piece.melodic_lines
         )
-        sufficient_stability = min_stabilities[position_type]
+        stability_of_current_sonority = compute_tonal_stability_of_sonority(
+            sonority_elements, degree_to_stability
+        )
+        sufficient_stability = min_stabilities[sonority.position_type]
         score += min(stability_of_current_sonority - sufficient_stability, 0)
     score /= len(piece.sonorities)
     return score
@@ -158,6 +182,7 @@ def get_scoring_functions_registry() -> Dict[str, Callable]:
         registry of scoring functions
     """
     registry = {
+        'absence_of_voice_crossing': evaluate_absence_of_voice_crossing,
         'conjunct_motion': evaluate_conjunct_motion,
         'harmonic_stability': evaluate_harmonic_stability,
         'tonal_stability': evaluate_tonal_stability,

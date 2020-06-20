@@ -220,6 +220,18 @@ def find_sonorities(
     return sonorities
 
 
+def convert_sonority_to_its_elements(
+        sonority: Sonority,
+        melodic_lines: List[List[PieceElement]]
+) -> List[PieceElement]:
+    """"""
+    sonority_as_elements = [
+        melodic_line[index]
+        for melodic_line, index in zip(melodic_lines, sonority.indices)
+    ]
+    return sonority_as_elements
+
+
 def generate_random_piece(
         tonic: str,
         scale_type: str,
