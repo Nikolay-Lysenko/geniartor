@@ -53,13 +53,12 @@ def create_midi_from_piece(
     """
     numeration_shift = pretty_midi.note_name_to_number('A0')
     pretty_midi_instrument = pretty_midi.Instrument(program=instrument)
-    current_time = opening_silence_in_seconds
-    zipped = zip(piece.sonorities, piece.sonorities_durations)
-    for sonority, duration_in_measures in zipped:
-        start_time = current_time
-        end_time = current_time + duration_in_measures * measure_in_seconds
-        for scale_element in sonority:
-            pitch = scale_element.position_in_semitones + numeration_shift
+    for melodic_line in piece.melodic_lines:
+        for element in melodic_line:
+            start_time = element.start_time * measure_in_seconds
+            start_time += opening_silence_in_seconds
+            end_time = start_time + element.duration * measure_in_seconds
+            pitch = element.position_in_semitones + numeration_shift
             note = pretty_midi.Note(
                 velocity=velocity,
                 pitch=pitch,
@@ -67,13 +66,13 @@ def create_midi_from_piece(
                 end=end_time
             )
             pretty_midi_instrument.notes.append(note)
-        current_time += duration_in_measures * measure_in_seconds
+    pretty_midi_instrument.notes.sort(key=lambda x: x.start)
 
     note = pretty_midi.Note(
         velocity=0,
         pitch=1,  # Arbitrary value that affects nothing.
-        start=current_time,
-        end=current_time + trailing_silence_in_seconds
+        start=piece.n_measures * measure_in_seconds,
+        end=piece.n_measures * measure_in_seconds + trailing_silence_in_seconds
     )
     pretty_midi_instrument.notes.append(note)
 
@@ -116,17 +115,15 @@ def create_events_from_piece(
     """
     all_notes = get_list_of_notes()
     events = []
-    current_time = opening_silence_in_seconds
-    zipped = zip(piece.sonorities, piece.sonorities_durations)
-    for sonority, duration_in_measures in zipped:
-        start_time = current_time
-        duration_in_seconds = duration_in_measures * measure_in_seconds
-        for scale_element in sonority:
-            pitch_id = scale_element.position_in_semitones
+    for melodic_line in piece.melodic_lines:
+        for element in melodic_line:
+            start_time = element.start_time * measure_in_seconds
+            start_time += opening_silence_in_seconds
+            duration_in_seconds = element.duration * measure_in_seconds
+            pitch_id = element.position_in_semitones
             note = all_notes[pitch_id]
             event = (timbre, start_time, duration_in_seconds, note, pitch_id)
             events.append(event)
-        current_time += duration_in_seconds
     events = sorted(events, key=lambda x: (x[1], x[4], x[2]))
     events = [
         f"{x[0]}\t{x[1]}\t{x[2]}\t{x[3]}\t{volume}\t{location}\t{effects}"
