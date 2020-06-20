@@ -12,7 +12,7 @@ from pkg_resources import resource_filename
 import yaml
 
 from .optimization import run_variable_neighborhood_search
-from .piece import Piece
+from .piece import generate_random_piece
 from .rendering import render
 
 
@@ -42,7 +42,7 @@ def main() -> None:
     with open(config_path) as config_file:
         settings = yaml.load(config_file, Loader=yaml.FullLoader)
 
-    piece = Piece(**settings['piece'])
+    piece = generate_random_piece(**settings['piece'])
     piece = run_variable_neighborhood_search(
         piece, settings['evaluation'], **settings['optimization']
     )

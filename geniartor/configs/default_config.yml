@@ -1,45 +1,49 @@
 piece:
   tonic: C
   scale_type: major
-  n_voices: 4
   lowest_note: C3
   highest_note: C6
-  sonorities_durations:
-    # 1st measure
-    - 0.5
-    - 0.25
-    - 0.25
-    # 2nd measure
-    - 0.25
-    - 0.25
-    - 0.25
-    - 0.25
-    # 3rd measure
-    - 0.25
-    - 0.125
-    - 0.125
-    - 0.25
-    - 0.125
-    - 0.125
-    # 4th measure
-    - 0.5
-    - 0.25
-    - 0.125
-    - 0.125
-    # 5th measure
-    - 0.5
-    - 0.5
-    # 6th measure
-    - 0.5
-    - 0.25
-    - 0.25
-    # 7th measure
-    - 0.25
-    - 0.25
-    - 0.25
-    - 0.25
-    # 8th measure
-    - 1.0
+  n_voices: 4
+  n_measures: 8
+  duration_weights:
+    0.125: 0.1
+    0.25: 0.4
+    0.5: 0.4
+    0.1: 0.1
+  valid_rhythmic_patterns:
+    - - 1.0
+    - - 0.5
+      - 0.5
+    - - 0.5
+      - 0.25
+      - 0.25
+    - - 0.5
+      - 0.25
+      - 0.125
+      - 0.125
+    - - 0.25
+      - 0.25
+      - 0.25
+      - 0.25
+    - - 0.25
+      - 0.25
+      - 0.25
+      - 0.125
+      - 0.125
+    - - 0.25
+      - 0.125
+      - 0.25
+      - 0.25
+    - - 0.5
+      - 1.0
+    - - 0.25
+      - 0.25
+      - 1.0
+    - - 0.25
+      - 0.125
+      - 0.125
+      - 1.0
+
 rendering:
   dir: geniartor_data
   measure_in_seconds: 1.0
@@ -49,11 +53,14 @@ rendering:
   sinethesizer:
     timbre: default_timbre
     volume: 0.3
+
 optimization:
   n_passes: 3
   perturbation_probability: 0.3
+
 evaluation:
   scoring_coefs:
+    absence_of_voice_crossing: 1
     conjunct_motion: 1
     harmonic_stability: 1
     tonal_stability: 1
