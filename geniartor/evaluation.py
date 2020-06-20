@@ -21,7 +21,7 @@ def evaluate_absence_of_voice_crossing(piece: Piece) -> float:
     :param piece:
         `Piece` instance
     :return:
-        fraction of sonorities with voices in wrong order
+        fraction of sonorities with voices in wrong order multiplied by -1
     """
     score = 0
     for sonority in piece.sonorities:
@@ -30,6 +30,35 @@ def evaluate_absence_of_voice_crossing(piece: Piece) -> float:
         )
         for first, second in zip(sonority_elements, sonority_elements[1:]):
             if first.position_in_semitones >= second.position_in_semitones:
+                score -= 1
+                break
+    score /= len(piece.sonorities)
+    return score
+
+
+def evaluate_absence_of_large_intervals(
+        piece: Piece, max_n_semitones: int = 16
+) -> float:
+    """
+    Evaluate absence of too large harmonic intervals between adjacent voices.
+
+    :param piece:
+        `Piece` instance
+    :param max_n_semitones:
+        maximum allowed interval in semitones between two
+        simultaneously sounding pitches from adjacent voices
+    :return:
+        fraction of sonorities with large intervals multiplied by -1
+    """
+    score = 0
+    for sonority in piece.sonorities:
+        sonority_elements = convert_sonority_to_its_elements(
+            sonority, piece.melodic_lines
+        )
+        for first, second in zip(sonority_elements, sonority_elements[1:]):
+            first_pos = first.position_in_semitones
+            second_pos = second.position_in_semitones
+            if abs(second_pos - first_pos) > max_n_semitones:
                 score -= 1
                 break
     score /= len(piece.sonorities)
@@ -50,7 +79,7 @@ def evaluate_conjunct_motion(
     :param n_semitones_to_penalty:
         mapping from size of melodic interval in semitones to penalty for it
     :return:
-        score between -1 and 0
+        average over voices penalty, a score between -1 and 0
     """
     score = 0
     for line in piece.melodic_lines:
@@ -183,6 +212,7 @@ def get_scoring_functions_registry() -> Dict[str, Callable]:
     """
     registry = {
         'absence_of_voice_crossing': evaluate_absence_of_voice_crossing,
+        'absence_of_large_intervals': evaluate_absence_of_large_intervals,
         'conjunct_motion': evaluate_conjunct_motion,
         'harmonic_stability': evaluate_harmonic_stability,
         'tonal_stability': evaluate_tonal_stability,
