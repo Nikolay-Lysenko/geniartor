@@ -8,10 +8,26 @@ Author: Nikolay Lysenko
 import itertools
 import random
 from copy import deepcopy
-from typing import Any, Dict
+from typing import Any, Dict, List
 
 from .evaluation import evaluate
-from .piece import Piece
+from .piece import Piece, PieceElement, ScaleElement
+
+
+def set_new_values_for_sonority(
+        melodic_lines: List[List[PieceElement]],
+        indices: List[int],
+        new_values: List[ScaleElement]
+) -> None:
+    """"""
+    zipped = zip(melodic_lines, indices, new_values)
+    for melodic_line, index, new_scale_element in zipped:
+        old_piece_element = melodic_line[index]
+        melodic_line[index] = PieceElement(
+            start_time=old_piece_element.start_time,
+            duration=old_piece_element.duration,
+            **new_scale_element
+        )
 
 
 def update_one_sonority(
@@ -31,9 +47,10 @@ def update_one_sonority(
         piece with one modified sonority
     """
     piece = deepcopy(result['piece'])
+    indices = piece.sonorities[sonority_position].indices
     alternatives = itertools.combinations(piece.pitches, piece.n_voices)
-    for alternative_sonority in alternatives:
-        piece.sonorities[sonority_position] = alternative_sonority
+    for alternative in alternatives:
+        set_new_values_for_sonority(piece.melodic_lines, indices, alternative)
         score = evaluate(piece, **evaluation_params)
         if score > result['score']:
             result = {'piece': deepcopy(piece), 'score': score}
@@ -53,18 +70,17 @@ def perturb(piece: Piece, perturbation_probability: float) -> Piece:
         altered piece
     """
     weights = [perturbation_probability, 1 - perturbation_probability]
-    new_sonorities = []
     for sonority in piece.sonorities:
         to_keep = random.choices([False, True], weights)[0]
         if to_keep:
-            new_sonorities.append(sonority)
-        else:
-            new_sonority = sorted(
-                random.sample(piece.pitches, piece.n_voices),
-                key=lambda x: x.position_in_semitones
-            )
-            new_sonorities.append(new_sonority)
-    piece.sonorities = new_sonorities
+            continue
+        new_scale_elements = sorted(
+            random.sample(piece.pitches, piece.n_voices),
+            key=lambda x: x.position_in_semitones
+        )
+        set_new_values_for_sonority(
+            piece.melodic_lines, sonority.indices, new_scale_elements
+        )
     return piece
 
 
