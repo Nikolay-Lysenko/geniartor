@@ -142,7 +142,7 @@ def generate_line_durations(
         duration = random.choices(
             appropriate_durations,
             [duration_weights[x] for x in appropriate_durations]
-        )
+        )[0]
 
         current_time += duration
 
@@ -178,9 +178,12 @@ def generate_random_line(
     for duration in line_durations:
         scale_element = random.choice(pitches)
         piece_element = PieceElement(
+            note=scale_element.note,
+            position_in_semitones=scale_element.position_in_semitones,
+            position_in_degrees=scale_element.position_in_degrees,
+            degree=scale_element.degree,
             start_time=current_time,
-            duration=duration,
-            **scale_element
+            duration=duration
         )
         melodic_line.append(piece_element)
         current_time += duration
@@ -193,8 +196,11 @@ def find_sonorities(
         melodic_lines: List[List[PieceElement]]
 ) -> List[Sonority]:
     """"""
-    start_times_with_duplicates = sum(accumulate(x) for x in lines_durations)
+    start_times_with_duplicates = []
+    for line_durations in lines_durations:
+        start_times_with_duplicates.extend(accumulate(line_durations))
     start_times = sorted(list(set(start_times_with_duplicates)))
+    start_times = [0] + start_times[:-1]
     indices_in_lines = [0 for _ in melodic_lines]
     initial_sonority = Sonority(
         start_time=0,
@@ -207,7 +213,7 @@ def find_sonorities(
         position_type = types.get(start_time - floor(start_time), 'other')
         indices_in_lines = [
             index + 1
-            if melodic_line[index + 1].start_time >= start_time
+            if melodic_line[index].start_time < start_time
             else index
             for index, melodic_line in zip(indices_in_lines, melodic_lines)
         ]

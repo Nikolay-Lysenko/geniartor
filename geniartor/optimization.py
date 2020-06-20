@@ -24,9 +24,12 @@ def set_new_values_for_sonority(
     for melodic_line, index, new_scale_element in zipped:
         old_piece_element = melodic_line[index]
         melodic_line[index] = PieceElement(
+            note=new_scale_element.note,
+            position_in_semitones=new_scale_element.position_in_semitones,
+            position_in_degrees=new_scale_element.position_in_degrees,
+            degree=new_scale_element.degree,
             start_time=old_piece_element.start_time,
-            duration=old_piece_element.duration,
-            **new_scale_element
+            duration=old_piece_element.duration
         )
 
 

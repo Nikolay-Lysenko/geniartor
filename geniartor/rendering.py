@@ -68,11 +68,13 @@ def create_midi_from_piece(
             pretty_midi_instrument.notes.append(note)
     pretty_midi_instrument.notes.sort(key=lambda x: x.start)
 
+    trailing_silence_start = piece.n_measures * measure_in_seconds
+    trailing_silence_start += opening_silence_in_seconds
     note = pretty_midi.Note(
         velocity=0,
         pitch=1,  # Arbitrary value that affects nothing.
-        start=piece.n_measures * measure_in_seconds,
-        end=piece.n_measures * measure_in_seconds + trailing_silence_in_seconds
+        start=trailing_silence_start,
+        end=trailing_silence_start + trailing_silence_in_seconds
     )
     pretty_midi_instrument.notes.append(note)
 
