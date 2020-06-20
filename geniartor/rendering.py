@@ -91,7 +91,8 @@ def create_events_from_piece(
         volume: float,
         location: int = 0,
         effects: str = '',
-        opening_silence_in_seconds: int = 1
+        opening_silence_in_seconds: int = 1,
+        trailing_silence_in_seconds: int = 1
 ) -> None:
     """
     Create TSV file with `sinethesizer` events from a piece.
@@ -112,6 +113,8 @@ def create_events_from_piece(
         sound effects to be applied to the resulting event
     :param opening_silence_in_seconds:
         number of seconds with silence to add at the start of the composition
+    :param trailing_silence_in_seconds:
+        number of seconds with silence to add at the end of the composition
     :return:
         None
     """
@@ -131,6 +134,13 @@ def create_events_from_piece(
         f"{x[0]}\t{x[1]}\t{x[2]}\t{x[3]}\t{volume}\t{location}\t{effects}"
         for x in events
     ]
+
+    trailing_silence_start = piece.n_measures * measure_in_seconds
+    trailing_silence_start += opening_silence_in_seconds
+    events.append(
+        f"{timbre}\t{trailing_silence_start}\t{trailing_silence_in_seconds}\t"
+        f"A0\t0\t0\t"
+    )
 
     columns = [
         'timbre', 'start_time', 'duration', 'frequency',
@@ -160,7 +170,7 @@ def create_wav_from_events(events_path: str, output_path: str) -> None:
     )
     settings = {
         'frame_rate': 44100,
-        'trailing_silence': 1,
+        'trailing_silence': 0.0,
         'max_channel_delay': 0.02,
         'timbres_registry': create_timbres_registry(presets_path)
     }
@@ -186,12 +196,16 @@ def render(piece: Piece, rendering_params: Dict[str, Any]) -> None:
 
     midi_path = os.path.join(nested_dir, 'music.mid')
     midi_params = rendering_params['midi']
-    measure = rendering_params['measure_in_seconds']
-    create_midi_from_piece(piece, midi_path, measure, **midi_params)
+    common_params = rendering_params['common']
+    create_midi_from_piece(
+        piece, midi_path, **midi_params, **common_params
+    )
 
     events_path = os.path.join(nested_dir, 'sinethesizer_events.tsv')
     events_params = rendering_params['sinethesizer']
-    create_events_from_piece(piece, events_path, measure, **events_params)
+    create_events_from_piece(
+        piece, events_path, **events_params, **common_params
+    )
 
     wav_path = os.path.join(nested_dir, 'music.wav')
     create_wav_from_events(events_path, wav_path)

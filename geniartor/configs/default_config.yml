@@ -47,7 +47,10 @@ piece:
 
 rendering:
   dir: geniartor_data
-  measure_in_seconds: 1.0
+  common:
+    measure_in_seconds: 2.0
+    opening_silence_in_seconds: 1.0
+    trailing_silence_in_seconds: 1.0
   midi:
     instrument: 0
     velocity: 100
