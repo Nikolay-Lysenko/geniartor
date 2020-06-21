@@ -92,7 +92,7 @@ def evaluate_conjunct_motion(
         curr_score = min(curr_score + penalty_deduction_per_line, 0)
         curr_score /= (len(line) - 1)
         score += curr_score
-    score /= piece.n_voices
+    score /= len(piece.melodic_lines)
     return score
 
 

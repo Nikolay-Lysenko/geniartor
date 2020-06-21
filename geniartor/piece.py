@@ -8,7 +8,7 @@ Author: Nikolay Lysenko
 import random
 from itertools import accumulate
 from math import floor
-from typing import Dict, List, NamedTuple, Tuple
+from typing import Dict, List, NamedTuple, Optional
 
 from sinethesizer.io.utils import get_note_to_position_mapping
 
@@ -43,11 +43,126 @@ class Sonority(NamedTuple):
 
 class Piece(NamedTuple):
     """A musical piece based on diatonic scale."""
-    n_voices: int
     n_measures: int
     pitches: List[ScaleElement]
     melodic_lines: List[List[PieceElement]]
     sonorities: List[Sonority]
+
+
+def update_current_measure_durations(
+        current_measure_durations: List[float], next_duration: float
+) -> List[float]:
+    """"""
+    extended_duration = sum(current_measure_durations) + next_duration
+    if extended_duration < 1:
+        current_measure_durations.append(next_duration)
+    elif extended_duration == 1:
+        current_measure_durations = []
+    else:
+        syncopated_duration = extended_duration - 1
+        current_measure_durations = [syncopated_duration]
+    return current_measure_durations
+
+
+def validate_line_durations(
+        line_durations: Optional[List[float]],
+        valid_rhythmic_patterns: List[List[float]],
+        n_measures: int
+) -> None:
+    """"""
+    if line_durations is None:
+        return
+    total_time = 0
+    current_measure_durations = []
+    for duration in line_durations:
+        extended_durations = current_measure_durations + [duration]
+        is_valid = any(
+            valid_pattern[:len(extended_durations)] == extended_durations
+            for valid_pattern in valid_rhythmic_patterns
+        )
+        if not is_valid:
+            raise ValueError(
+                f"Disallowed rhythmic pattern found: {extended_durations}."
+            )
+        total_time += duration
+        current_measure_durations = update_current_measure_durations(
+            current_measure_durations, duration
+        )
+    if total_time != n_measures:
+        raise ValueError(
+            f"Line lasts {total_time} measures, "
+            f"but {n_measures} measures are needed."
+        )
+
+
+def validate_rhythm_arguments(
+        n_measures: int,
+        valid_rhythmic_patterns: List[List[float]],
+        lines_durations: List[Optional[List[float]]] = None,
+        duration_weights: Optional[Dict[float, float]] = None
+) -> None:
+    """"""
+    if duration_weights is None and any(x is None for x in lines_durations):
+        raise ValueError(
+            "If `duration_weights` are not passed, "
+            "no elements of `lines_durations` can be `None`."
+        )
+    for line_durations in lines_durations:
+        validate_line_durations(
+            line_durations, valid_rhythmic_patterns, n_measures
+        )
+
+
+def select_appropriate_durations(
+        current_time: float,
+        total_time: float,
+        current_measure_durations: List[float],
+        valid_rhythmic_patterns: List[List[float]]
+) -> List[float]:
+    """"""
+    all_durations = [0.125, 0.25, 0.5, 1.0]
+    appropriate_durations = []
+    for duration in all_durations:
+        if current_time + duration > total_time:
+            continue
+        extended_durations = current_measure_durations + [duration]
+        for valid_pattern in valid_rhythmic_patterns:
+            if valid_pattern[:len(extended_durations)] == extended_durations:
+                appropriate_durations.append(duration)
+                break
+    return appropriate_durations
+
+
+def generate_line_durations(
+        n_measures: int,
+        duration_weights: Dict[float, float],
+        valid_rhythmic_patterns: List[List[float]],
+        end_with_whole_note: bool = True
+) -> List[float]:
+    """"""
+    current_time = 0
+    line_durations = []
+    current_measure_durations = []
+    total_time = n_measures - int(end_with_whole_note)
+
+    while current_time < total_time:
+        appropriate_durations = select_appropriate_durations(
+            current_time, total_time, current_measure_durations,
+            valid_rhythmic_patterns
+        )
+        duration = random.choices(
+            appropriate_durations,
+            [duration_weights[x] for x in appropriate_durations]
+        )[0]
+        current_time += duration
+        current_measure_durations = update_current_measure_durations(
+            current_measure_durations, duration
+        )
+        line_durations.append(duration)
+
+    if end_with_whole_note:
+        line_durations.append(1.0)
+    return line_durations
 
 
 def create_diatonic_scale(tonic: str, scale_type: str) -> List[ScaleElement]:
@@ -105,74 +220,11 @@ def slice_scale(
     return res
 
 
-def select_appropriate_durations(
-        current_time: float, total_time: float,
-        current_rhythm: List[float], valid_rhythmic_patterns: List[List[float]]
-) -> List[float]:
-    """"""
-    all_durations = [0.125, 0.25, 0.5, 1.0]
-    appropriate_durations = []
-    for duration in all_durations:
-        if current_time + duration > total_time:
-            continue
-        extended_rhythm = current_rhythm + [duration]
-        for valid_pattern in valid_rhythmic_patterns:
-            if valid_pattern[:len(extended_rhythm)] == extended_rhythm:
-                appropriate_durations.append(duration)
-                break
-    return appropriate_durations
-
-
-def generate_line_durations(
-        n_measures: int,
-        duration_weights: Dict[float, float],
-        valid_rhythmic_patterns: List[List[float]],
-        end_with_whole_note: bool = True
-) -> List[float]:
-    """"""
-    current_time = 0
-    rhythm = []
-    current_rhythm = []
-    total_time = n_measures - int(end_with_whole_note)
-
-    while current_time < total_time:
-        appropriate_durations = select_appropriate_durations(
-            current_time, total_time, current_rhythm, valid_rhythmic_patterns
-        )
-        duration = random.choices(
-            appropriate_durations,
-            [duration_weights[x] for x in appropriate_durations]
-        )[0]
-
-        current_time += duration
-
-        extended_rhythm = sum(current_rhythm) + duration
-        if extended_rhythm < 1:
-            current_rhythm.append(duration)
-        elif extended_rhythm == 1:
-            current_rhythm = []
-        else:
-            syncopated_duration = extended_rhythm - 1
-            current_rhythm = [syncopated_duration]
-
-        rhythm.append(duration)
-
-    if end_with_whole_note:
-        rhythm.append(1.0)
-    return rhythm
-
-
 def generate_random_line(
-        n_measures: int,
-        duration_weights: Dict[float, float],
-        valid_rhythmic_patterns: List[List[float]],
+        line_durations: List[float],
         pitches: List[ScaleElement]
-) -> Tuple[List[float], List[PieceElement]]:
+) -> List[PieceElement]:
     """"""
-    line_durations = generate_line_durations(
-        n_measures, duration_weights, valid_rhythmic_patterns
-    )
-
     melodic_line = []
     current_time = 0
     for duration in line_durations:
@@ -187,8 +239,7 @@ def generate_random_line(
         )
         melodic_line.append(piece_element)
         current_time += duration
-
-    return line_durations, melodic_line
+    return melodic_line
 
 
 def find_sonorities(
@@ -245,10 +296,10 @@ def generate_random_piece(
         scale_type: str,
         lowest_note: str,
         highest_note: str,
-        n_voices: int,
         n_measures: int,
-        duration_weights: Dict[float, float],
-        valid_rhythmic_patterns: List[List[float]]
+        valid_rhythmic_patterns: List[List[float]],
+        lines_durations: List[Optional[List[float]]],
+        duration_weights: Optional[Dict[float, float]] = None
 ) -> Piece:
     """
     Generate random piece.
@@ -262,26 +313,31 @@ def generate_random_piece(
         lowest available note (like C4)
     :param highest_note:
         highest available note (like C6)
-    :param n_voices:
-        number of voices (parts, melodic lines)
     :param n_measures:
         duration of piece in measures
-    :param duration_weights:
-        mapping of line element duration to weight of its random selection
     :param valid_rhythmic_patterns:
         all valid ways to split measure span into spans of its notes;
         durations of tied over bar notes are included without clipping
+    :param lines_durations:
+        durations of notes (in fractions of whole measure) for each line;
+        if this is not passed, they are generated at random
+    :param duration_weights:
+        mapping of line element duration to weight of its random selection
     """
+    validate_rhythm_arguments(
+        n_measures, valid_rhythmic_patterns, lines_durations, duration_weights
+    )
+    for index, line_duration in enumerate(lines_durations):
+        if line_duration is None:
+            lines_durations[index] = generate_line_durations(
+                n_measures, duration_weights, valid_rhythmic_patterns
+            )
     scale = create_diatonic_scale(tonic, scale_type)
     pitches = slice_scale(scale, lowest_note, highest_note)
-    lines_durations = []
     melodic_lines = []
-    for _ in range(n_voices):
-        line_durations, melodic_line = generate_random_line(
-            n_measures, duration_weights, valid_rhythmic_patterns, pitches
-        )
-        lines_durations.append(line_durations)
+    for line_durations in lines_durations:
+        melodic_line = generate_random_line(line_durations, pitches)
         melodic_lines.append(melodic_line)
     sonorities = find_sonorities(lines_durations, melodic_lines)
-    piece = Piece(n_voices, n_measures, pitches, melodic_lines, sonorities)
+    piece = Piece(n_measures, pitches, melodic_lines, sonorities)
     return piece

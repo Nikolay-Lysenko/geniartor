@@ -51,7 +51,8 @@ def update_one_sonority(
     """
     piece = deepcopy(result['piece'])
     indices = piece.sonorities[sonority_position].indices
-    alternatives = itertools.combinations(piece.pitches, piece.n_voices)
+    n_lines = len(piece.melodic_lines)
+    alternatives = itertools.combinations(piece.pitches, n_lines)
     for alternative in alternatives:
         set_new_values_for_sonority(piece.melodic_lines, indices, alternative)
         score = evaluate(piece, **evaluation_params)
@@ -78,7 +79,7 @@ def perturb(piece: Piece, perturbation_probability: float) -> Piece:
         if to_keep:
             continue
         new_scale_elements = sorted(
-            random.sample(piece.pitches, piece.n_voices),
+            random.sample(piece.pitches, len(piece.melodic_lines)),
             key=lambda x: x.position_in_semitones
         )
         set_new_values_for_sonority(
