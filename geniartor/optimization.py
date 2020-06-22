@@ -19,7 +19,18 @@ def set_new_values_for_sonority(
         indices: List[int],
         new_values: List[ScaleElement]
 ) -> None:
-    """"""
+    """
+    Update elements forming a sonority.
+
+    :param melodic_lines:
+        lists of notes (with pitch, duration, and so on)
+    :param indices:
+        indices of the sonority elements within their lines
+    :param new_values:
+        new elements of the sonority
+    :return:
+        None
+    """
     zipped = zip(melodic_lines, indices, new_values)
     for melodic_line, index, new_scale_element in zipped:
         old_piece_element = melodic_line[index]

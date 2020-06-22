@@ -5,10 +5,10 @@ piece:
   highest_note: C6
   n_measures: 8
   lines_durations:
-      - null
-      - null
-      - null
-      - null
+    - null
+    - null
+    - null
+    - null
   duration_weights:
     0.125: 0.1
     0.25: 0.4

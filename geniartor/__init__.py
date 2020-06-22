@@ -1,5 +1,5 @@
 """
-Generate music with a neural network trained to optimize evaluational scores.
+Compose music by an optimization problem solving.
 
 Author: Nikolay Lysenko
 """

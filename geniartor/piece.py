@@ -35,7 +35,7 @@ class PieceElement(NamedTuple):
 
 
 class Sonority(NamedTuple):
-    """Simultaneously sounding pitches."""
+    """Simultaneously sounding pitches (as meta-information about them)."""
     start_time: float
     position_type: str
     indices: List[int]
@@ -52,14 +52,26 @@ class Piece(NamedTuple):
 def update_current_measure_durations(
         current_measure_durations: List[float], next_duration: float
 ) -> List[float]:
-    """"""
+    """
+    Update a list of notes durations from a measure in progress.
+
+    :param current_measure_durations:
+        durations of notes (in fractions of whole measure)
+        from start of the measure to the last added duration
+    :param next_duration:
+        duration of the next note (in fractions of whole measure)
+    :return:
+        list of notes durations from the current measure if it is still
+        unfinished or list of notes durations from the next measure
+    """
+    duration_of_one_measure = 1
     extended_duration = sum(current_measure_durations) + next_duration
-    if extended_duration < 1:
+    if extended_duration < duration_of_one_measure:
         current_measure_durations.append(next_duration)
-    elif extended_duration == 1:
+    elif extended_duration == duration_of_one_measure:
         current_measure_durations = []
     else:
-        syncopated_duration = extended_duration - 1
+        syncopated_duration = extended_duration - duration_of_one_measure
         current_measure_durations = [syncopated_duration]
     return current_measure_durations
 
@@ -69,7 +81,20 @@ def validate_line_durations(
         valid_rhythmic_patterns: List[List[float]],
         n_measures: int
 ) -> None:
-    """"""
+    """
+    Check that line has proper duration and has valid rhythmic patterns.
+
+    :param line_durations:
+        durations of all notes from the line from its start to its finish
+        (in fractions of whole measure)
+    :param valid_rhythmic_patterns:
+        list of all valid ways to split a measure duration into durations of
+        its notes; every note duration must be given in fractions of measure
+    :param n_measures:
+        required duration of the line (in measures)
+    :return:
+        None
+    """
     if line_durations is None:
         return
     total_time = 0
@@ -101,7 +126,22 @@ def validate_rhythm_arguments(
         lines_durations: List[Optional[List[float]]] = None,
         duration_weights: Optional[Dict[float, float]] = None
 ) -> None:
-    """"""
+    """
+    Check that arguments defining rhythm of a piece to be created, are valid.
+
+    :param n_measures:
+        duration of a piece (in measures)
+    :param valid_rhythmic_patterns:
+        list of all valid ways to split a measure duration into durations of
+        its notes; every note duration must be given in fractions of measure
+    :param lines_durations:
+        durations of notes (in fractions of whole measure) for each line;
+        some of them may be `None`
+    :param duration_weights:
+        mapping of line element duration to weight of its random selection
+    :return:
+        None
+    """
     if duration_weights is None and any(x is None for x in lines_durations):
         raise ValueError(
             "If `duration_weights` are not passed, "
@@ -119,7 +159,22 @@ def select_appropriate_durations(
         current_measure_durations: List[float],
         valid_rhythmic_patterns: List[List[float]]
 ) -> List[float]:
-    """"""
+    """
+    Find all options to continue rhythm of unfinished measure one note ahead.
+
+    :param current_time:
+        total duration of all previous notes
+    :param total_time:
+        required total time of all notes to be generated
+    :param current_measure_durations:
+        durations of notes (in fractions of whole measure)
+        from start of the measure to the last added duration
+    :param valid_rhythmic_patterns:
+        list of all valid ways to split a measure duration into durations of
+        its notes; every note duration must be given in fractions of measure
+    :return:
+        all possible durations of the next note
+    """
     all_durations = [0.125, 0.25, 0.5, 1.0]
     appropriate_durations = []
     for duration in all_durations:
@@ -139,7 +194,23 @@ def generate_line_durations(
         valid_rhythmic_patterns: List[List[float]],
         end_with_whole_note: bool = True
 ) -> List[float]:
-    """"""
+    """
+    Generate duration of notes from a line at random.
+
+    :param n_measures:
+        total duration of a line (in measures)
+    :param duration_weights:
+        mapping of line element duration to weight of its random selection
+    :param valid_rhythmic_patterns:
+        list of all valid ways to split a measure duration into durations of
+        its notes; every note duration must be given in fractions of measure
+    :param end_with_whole_note:
+        if it is set to `True`, it is guaranteed that line is ended with a
+        whole note; if it is set to `False`, line can end with a whole note
+        by chance
+    :return:
+        durations of all line notes (in fractions of whole measure)
+    """
     current_time = 0
     line_durations = []
     current_measure_durations = []
@@ -213,6 +284,8 @@ def slice_scale(
         lowest note to keep (inclusively)
     :param highest_note:
         highest note to keep (inclusively)
+    :return:
+        sliced scale
     """
     min_pos = NOTE_TO_POSITION[lowest_note]
     max_pos = NOTE_TO_POSITION[highest_note]
@@ -224,7 +297,17 @@ def generate_random_line(
         line_durations: List[float],
         pitches: List[ScaleElement]
 ) -> List[PieceElement]:
-    """"""
+    """
+    Generate line at random given its rhythm.
+
+    :param line_durations:
+        durations of all notes from the line from its start to its finish
+        (in fractions of whole measure)
+    :param pitches:
+        all pitches available in a piece
+    :return:
+        melodic line
+    """
     melodic_line = []
     current_time = 0
     for duration in line_durations:
@@ -246,7 +329,16 @@ def find_sonorities(
         lines_durations: List[List[float]],
         melodic_lines: List[List[PieceElement]]
 ) -> List[Sonority]:
-    """"""
+    """
+    Find all sets of simultaneously sounding pitches.
+
+    :param lines_durations:
+        durations of notes (in fractions of whole measure) for each line
+    :param melodic_lines:
+        lists of notes (with pitch, duration, and so on)
+    :return:
+        all sonorities found in a piece
+    """
     start_times_with_duplicates = []
     for line_durations in lines_durations:
         start_times_with_duplicates.extend(accumulate(line_durations))
@@ -283,7 +375,16 @@ def convert_sonority_to_its_elements(
         sonority: Sonority,
         melodic_lines: List[List[PieceElement]]
 ) -> List[PieceElement]:
-    """"""
+    """
+    Convert sonority to exact values of its elements.
+
+    :param sonority:
+        data structure that keeps indices of simultaneously sounding pitches
+    :param melodic_lines:
+        lists of notes (with pitch, duration, and so on)
+    :return:
+        simultaneously sounding elements
+    """
     sonority_as_elements = [
         melodic_line[index]
         for melodic_line, index in zip(melodic_lines, sonority.indices)
@@ -320,7 +421,8 @@ def generate_random_piece(
         durations of tied over bar notes are included without clipping
     :param lines_durations:
         durations of notes (in fractions of whole measure) for each line;
-        if this is not passed, they are generated at random
+        there can be `None` values for some line, if so, durations for them
+        are generated at random
     :param duration_weights:
         mapping of line element duration to weight of its random selection
     """

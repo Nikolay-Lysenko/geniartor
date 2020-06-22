@@ -11,7 +11,7 @@ from setuptools import setup, find_packages
 
 current_dir = os.path.abspath(os.path.dirname(__file__))
 
-description = 'Generation of music that optimizes evaluational criteria.'
+description = 'Music composition by optimizing of evaluational scores.'
 with open(os.path.join(current_dir, 'README.md'), encoding='utf-8') as f:
     long_description = f.read()
 

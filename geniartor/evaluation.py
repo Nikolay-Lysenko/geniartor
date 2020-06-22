@@ -74,7 +74,7 @@ def evaluate_absence_of_narrow_ranges(
         piece: Piece, penalties: Dict[int, float], min_size: int = 9
 ) -> float:
     """
-    Evaluate melodic fluency based on absence of narrow ranges.
+    Evaluate melodic fluency based on absence of stalling within narrow ranges.
 
     :param piece:
         `Piece` instance
