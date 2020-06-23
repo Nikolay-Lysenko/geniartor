@@ -105,6 +105,12 @@ evaluation:
         downbeat: 0.75
         middle: 0.5
         other: 0.25
+      max_stabilities:
+        beginning: 1.0
+        ending: 1.0
+        downbeat: 1.0
+        middle: 0.9
+        other: 0.8
       n_semitones_to_stability:
         0: 1.0
         1: 0.2
@@ -125,6 +131,12 @@ evaluation:
         downbeat: 0.7
         middle: 0.5
         other: 0.2
+      max_stabilities:
+        beginning: 1.0
+        ending: 1.0
+        downbeat: 1.0
+        middle: 0.9
+        other: 0.8
       degree_to_stability:
         1: 1.0
         2: 0.4
