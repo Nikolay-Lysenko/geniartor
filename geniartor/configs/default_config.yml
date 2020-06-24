@@ -48,6 +48,7 @@ piece:
       - 0.125
       - 0.125
       - 1.0
+  custom_position_types: {}
 
 rendering:
   dir: geniartor_data

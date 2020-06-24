@@ -327,7 +327,8 @@ def generate_random_line(
 
 def find_sonorities(
         lines_durations: List[List[float]],
-        melodic_lines: List[List[PieceElement]]
+        melodic_lines: List[List[PieceElement]],
+        custom_position_types: Optional[Dict[float, str]] = None
 ) -> List[Sonority]:
     """
     Find all sets of simultaneously sounding pitches.
@@ -336,6 +337,8 @@ def find_sonorities(
         durations of notes (in fractions of whole measure) for each line
     :param melodic_lines:
         lists of notes (with pitch, duration, and so on)
+    :param custom_position_types:
+        mapping from start time of sonority to its user-defined type
     :return:
         all sonorities found in a piece
     """
@@ -351,9 +354,13 @@ def find_sonorities(
         indices=indices_in_lines
     )
     sonorities = [initial_sonority]
-    types = {0.0: 'downbeat', 0.5: 'middle'}
+    custom_position_types = custom_position_types or {}
+    core_position_types = {0.0: 'downbeat', 0.5: 'middle'}
     for start_time in start_times[1:-1]:
-        position_type = types.get(start_time - floor(start_time), 'other')
+        position_type = custom_position_types.get(
+            start_time,
+            core_position_types.get(start_time - floor(start_time), 'other')
+        )
         indices_in_lines = [
             index + 1
             if melodic_line[index].start_time < start_time
@@ -400,7 +407,8 @@ def generate_random_piece(
         n_measures: int,
         valid_rhythmic_patterns: List[List[float]],
         lines_durations: List[Optional[List[float]]],
-        duration_weights: Optional[Dict[float, float]] = None
+        duration_weights: Optional[Dict[float, float]] = None,
+        custom_position_types: Optional[Dict[float, str]] = None
 ) -> Piece:
     """
     Generate random piece.
@@ -425,6 +433,8 @@ def generate_random_piece(
         are generated at random
     :param duration_weights:
         mapping of line element duration to weight of its random selection
+    :param custom_position_types:
+        mapping from start time of sonority to its user-defined type
     """
     validate_rhythm_arguments(
         n_measures, valid_rhythmic_patterns, lines_durations, duration_weights
@@ -440,6 +450,8 @@ def generate_random_piece(
     for line_durations in lines_durations:
         melodic_line = generate_random_line(line_durations, pitches)
         melodic_lines.append(melodic_line)
-    sonorities = find_sonorities(lines_durations, melodic_lines)
+    sonorities = find_sonorities(
+        lines_durations, melodic_lines, custom_position_types
+    )
     piece = Piece(n_measures, pitches, melodic_lines, sonorities)
     return piece
