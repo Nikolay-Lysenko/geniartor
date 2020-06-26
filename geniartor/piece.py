@@ -121,22 +121,22 @@ def validate_line_durations(
 
 
 def validate_rhythm_arguments(
-        n_measures: int,
+        lines_durations: List[Optional[List[float]]],
         valid_rhythmic_patterns: List[List[float]],
-        lines_durations: List[Optional[List[float]]] = None,
+        n_measures: int,
         duration_weights: Optional[Dict[float, float]] = None
 ) -> None:
     """
     Check that arguments defining rhythm of a piece to be created, are valid.
 
-    :param n_measures:
-        duration of a piece (in measures)
-    :param valid_rhythmic_patterns:
-        list of all valid ways to split a measure duration into durations of
-        its notes; every note duration must be given in fractions of measure
     :param lines_durations:
         durations of notes (in fractions of whole measure) for each line;
         some of them may be `None`
+    :param valid_rhythmic_patterns:
+        list of all valid ways to split a measure duration into durations of
+        its notes; every note duration must be given in fractions of measure
+    :param n_measures:
+        duration of a piece (in measures)
     :param duration_weights:
         mapping of line element duration to weight of its random selection
     :return:
@@ -437,7 +437,7 @@ def generate_random_piece(
         mapping from start time of sonority to its user-defined type
     """
     validate_rhythm_arguments(
-        n_measures, valid_rhythmic_patterns, lines_durations, duration_weights
+        lines_durations, valid_rhythmic_patterns, n_measures, duration_weights
     )
     for index, line_duration in enumerate(lines_durations):
         if line_duration is None:
