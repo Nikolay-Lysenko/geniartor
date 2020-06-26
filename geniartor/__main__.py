@@ -28,6 +28,15 @@ def parse_cli_args() -> argparse.Namespace:
         '-c', '--config_path', type=str, default=None,
         help='path to configuration file'
     )
+    parser.add_argument(
+        '-n', '--n_passes', type=int, default=5,
+        help='number of passes from all sonorities'
+    )
+    parser.add_argument(
+        '-p', '--perturbation_probability', type=float, default=0.3,
+        help='probability that sonority is replaced with a random sonority '
+             'after a local optimum is reached'
+    )
     cli_args = parser.parse_args()
     return cli_args
 
@@ -44,7 +53,10 @@ def main() -> None:
 
     piece = generate_random_piece(**settings['piece'])
     piece = run_variable_neighborhood_search(
-        piece, settings['evaluation'], **settings['optimization']
+        piece,
+        settings['evaluation'],
+        cli_args.n_passes,
+        cli_args.perturbation_probability
     )
 
     results_dir = settings['rendering']['dir']

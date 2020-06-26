@@ -63,10 +63,6 @@ rendering:
     timbre: default_timbre
     volume: 0.25
 
-optimization:
-  n_passes: 5
-  perturbation_probability: 0.3
-
 evaluation:
   scoring_coefs:
     absence_of_large_intervals: 1
