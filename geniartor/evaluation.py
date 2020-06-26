@@ -252,7 +252,7 @@ def evaluate_tonal_stability(
     :param min_stabilities:
         mapping from type of sonority's start position to minimum
         sufficient stability
-    :param min_stabilities:
+    :param max_stabilities:
         mapping from type of sonority's start position to maximum
         desired stability
     :param degree_to_stability:
