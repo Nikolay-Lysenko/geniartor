@@ -327,52 +327,55 @@ def generate_random_line(
 
 def find_sonorities(
         lines_durations: List[List[float]],
-        melodic_lines: List[List[PieceElement]],
         custom_position_types: Optional[Dict[float, str]] = None
 ) -> List[Sonority]:
     """
-    Find all sets of simultaneously sounding pitches.
+    Find indices of all simultaneously sounding pitches.
 
     :param lines_durations:
         durations of notes (in fractions of whole measure) for each line
-    :param melodic_lines:
-        lists of notes (with pitch, duration, and so on)
     :param custom_position_types:
         mapping from start time of sonority to its user-defined type
     :return:
-        all sonorities found in a piece
+        indices of all simultaneously sounding pitches found in a piece
     """
-    start_times_with_duplicates = []
-    for line_durations in lines_durations:
-        start_times_with_duplicates.extend(accumulate(line_durations))
-    start_times = sorted(list(set(start_times_with_duplicates)))
-    start_times = [0] + start_times[:-1]
-    indices_in_lines = [0 for _ in melodic_lines]
+    all_lines_start_times = [
+        [0.0] + list(accumulate(line_durations))[:-1]
+        for line_durations in lines_durations
+    ]
+    flat_start_times = [
+        x
+        for line_start_times in all_lines_start_times
+        for x in line_start_times
+    ]
+    unique_start_times = sorted(list(set(flat_start_times)))
+    indices_in_lines = [0 for _ in lines_durations]
     initial_sonority = Sonority(
-        start_time=0,
+        start_time=0.0,
         position_type='beginning',
         indices=indices_in_lines
     )
     sonorities = [initial_sonority]
     custom_position_types = custom_position_types or {}
     core_position_types = {0.0: 'downbeat', 0.5: 'middle'}
-    for start_time in start_times[1:-1]:
+    for start_time in unique_start_times[1:-1]:
         position_type = custom_position_types.get(
             start_time,
             core_position_types.get(start_time - floor(start_time), 'other')
         )
+        zipped = zip(indices_in_lines, all_lines_start_times)
         indices_in_lines = [
             index + 1
-            if melodic_line[index].start_time < start_time
+            if line_start_times[index + 1] <= start_time
             else index
-            for index, melodic_line in zip(indices_in_lines, melodic_lines)
+            for index, line_start_times in zipped
         ]
         sonority = Sonority(start_time, position_type, indices_in_lines)
         sonorities.append(sonority)
     last_sonority = Sonority(
-        start_time=start_times[-1],
+        start_time=unique_start_times[-1],
         position_type='ending',
-        indices=[-1 for _ in melodic_lines]
+        indices=[-1 for _ in lines_durations]
     )
     sonorities.append(last_sonority)
     return sonorities
@@ -450,8 +453,6 @@ def generate_random_piece(
     for line_durations in lines_durations:
         melodic_line = generate_random_line(line_durations, pitches)
         melodic_lines.append(melodic_line)
-    sonorities = find_sonorities(
-        lines_durations, melodic_lines, custom_position_types
-    )
+    sonorities = find_sonorities(lines_durations, custom_position_types)
     piece = Piece(n_measures, pitches, melodic_lines, sonorities)
     return piece
