@@ -9,9 +9,9 @@ import datetime
 import os
 import subprocess
 import traceback
-from math import floor
+from math import ceil, floor
 from pkg_resources import resource_filename
-from typing import Any, Dict
+from typing import Any, Dict, List
 
 import pretty_midi
 from sinethesizer.io import (
@@ -181,6 +181,92 @@ def create_wav_from_events(events_path: str, output_path: str) -> None:
     write_timeline_to_wav(output_path, timeline, settings['frame_rate'])
 
 
+def make_lilypond_template(n_voices: int) -> str:
+    """
+    Make template of Lilypond text file.
+
+    :param n_voices:
+        number of voices in a piece to be rendered
+    :return:
+        template
+    """
+    raw_template = (
+        "\\version \"2.18.2\"\n"
+        "\\layout {{{{\n"
+        "    indent = #0\n"
+        "}}}}\n"
+        "\\new StaffGroup <<\n"
+        "    \\new Staff <<\n"
+        "        \\clef treble\n"
+        "        \\time 4/4\n"
+        "{}"
+        "    >>\n"
+        "    \\new Staff <<\n"
+        "        \\clef bass\n"
+        "        \\time 4/4\n"
+        "{}"
+        "    >>\n"
+        ">>"
+    )
+    voices = []
+    ordinals = [
+        "first", "second", "third", "fourth", "fifth", "sixth", "seventh",
+        "eighth", "ninth", "tenth", "eleventh", "twelfth"
+    ]
+    numbers = [
+        "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine",
+        "Ten", "Eleven", "Twelve"
+    ]
+    for ordinal, number, _ in zip(ordinals, numbers, range(n_voices)):
+        voices.append(
+            f"        \\new Voice = \"{ordinal}\"\n"
+            f"            {{{{ \\voice{number} {{}}}}}}\n"
+        )
+    treble_bass_threshold = ceil(n_voices / 2)
+    template = raw_template.format(
+        "".join(voices[:treble_bass_threshold]),
+        "".join(voices[treble_bass_threshold:])
+    )
+    return template
+
+
+def get_lilypond_order_of_voices(n_voices: int) -> List[int]:
+    """
+    Enumerate voices (from lowest to highest) in Lilypond order.
+
+    See more about Lilypond order ('Voice order' section):
+    http://lilypond.org/doc/v2.18/Documentation/notation/multiple-voices
+
+    :param n_voices:
+        number of voices in a piece to be rendered
+    :return:
+        indices of voices in Lilypond order
+    """
+    def enumerate_for_one_staff(n_voices_at_staff: int) -> List[int]:
+        max_index = n_voices_at_staff - 1
+        results = []
+        for i in range(n_voices_at_staff):
+            result = max_index - int(round(2 * abs(i - max_index / 2)))
+            result += int(i < max_index / 2)
+            results.append(result)
+        return results
+
+    n_voices_at_upper_staff = ceil(n_voices / 2)
+    n_voices_at_lower_staff = floor(n_voices / 2)
+    lower_voices_priorities = [
+        x + n_voices_at_upper_staff
+        for x in enumerate_for_one_staff(n_voices_at_lower_staff)
+    ]
+    upper_voices_priorities = enumerate_for_one_staff(n_voices_at_upper_staff)
+    priorities = lower_voices_priorities + upper_voices_priorities
+    ordering = sorted(
+        list((index, priority) for index, priority in enumerate(priorities)),
+        key=lambda x: x[1]
+    )
+    ordering = [x[0] for x in ordering]
+    return ordering
+
+
 def create_lilypond_file_from_piece(piece: Piece, output_path: str) -> None:
     """
     Create text file in format of Lilypond sheet music editor.
@@ -192,78 +278,11 @@ def create_lilypond_file_from_piece(piece: Piece, output_path: str) -> None:
     :return:
         None
     """
-    preamble = (
-        "\\version \"2.18.2\"\n"
-        "\\layout {{\n"
-        "    indent = #0\n"
-        "}}\n"
-    )
-    templates = {
-        2: (
-            "\\new StaffGroup <<\n"
-            "    \\new Staff <<\n"
-            "        \\clef treble\n"
-            "        \\time 4/4\n"
-            "        \\new Voice = \"first\"\n"
-            "            {{ \\voiceOne {}}}\n"
-            "    >>\n"
-            "    \\new Staff <<\n"
-            "        \\clef bass\n"
-            "        \\time 4/4\n"
-            "        \\new Voice = \"second\"\n"
-            "            {{ \\voiceTwo {}}}\n"
-            "    >>\n"
-            ">>"
-        ),
-        3: (
-            "\\new StaffGroup <<\n"
-            "    \\new Staff <<\n"
-            "        \\clef treble\n"
-            "        \\time 4/4\n"
-            "        \\new Voice = \"first\"\n"
-            "            {{ \\voiceOne {}}}\n"
-            "        \\new Voice = \"second\"\n"
-            "            {{ \\voiceTwo {}}}\n"
-            "    >>\n"
-            "    \\new Staff <<\n"
-            "        \\clef bass\n"
-            "        \\time 4/4\n"
-            "        \\new Voice = \"third\"\n"
-            "            {{ \\voiceThree {}}}\n"
-            "    >>\n"
-            ">>"
-        ),
-        4: (
-            "\\new StaffGroup <<\n"
-            "    \\new Staff <<\n"
-            "        \\clef treble\n"
-            "        \\time 4/4\n"
-            "        \\new Voice = \"first\"\n"
-            "            {{ \\voiceOne {}}}\n"
-            "        \\new Voice = \"second\"\n"
-            "            {{ \\voiceTwo {}}}\n"
-            "    >>\n"
-            "    \\new Staff <<\n"
-            "        \\clef bass\n"
-            "        \\time 4/4\n"
-            "        \\new Voice = \"third\"\n"
-            "            {{ \\voiceThree {}}}\n"
-            "        \\new Voice = \"fourth\"\n"
-            "            {{ \\voiceFour {}}}\n"
-            "    >>\n"
-            ">>"
-        ),
-    }
-    try:
-        template = preamble + templates[len(piece.melodic_lines)]
-    except KeyError:  # pragma: no cover
-        print(
-            f"Currently, rendering of {len(piece.melodic_lines)}-part "
-            f"compositions to Lilypond is not supported."
-        )
-        return
+    template = make_lilypond_template(len(piece.melodic_lines))
     lilypond_voices = []
-    for melodic_line in piece.melodic_lines[::-1]:
+    indices = get_lilypond_order_of_voices(len(piece.melodic_lines))
+    for index in indices:
+        melodic_line = piece.melodic_lines[index]
         current_time = 0
         lilypond_voice = []
         for piece_element in melodic_line:
