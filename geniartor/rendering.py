@@ -21,7 +21,7 @@ from sinethesizer.io import (
 )
 from sinethesizer.io.utils import get_list_of_notes
 
-from .piece import Piece
+from .piece import Piece, PieceElement
 
 
 def create_midi_from_piece(
@@ -267,6 +267,39 @@ def get_lilypond_order_of_voices(n_voices: int) -> List[int]:
     return ordering
 
 
+def convert_to_lilypond_note(piece_element: PieceElement) -> str:
+    """
+    Convert `PieceElement` instance to note in Lilypond absolute notation.
+
+    :param piece_element:
+        `PieceElement` instance
+    :return:
+        note in Lilypond absolute notation
+    """
+    pitch_class = piece_element.note[:-1]
+    pitch_class = pitch_class.replace('#', 'is').replace('b', 'es')
+    pitch_class = pitch_class.lower()
+
+    octave_id = int(piece_element.note[-1])
+    lilypond_default_octave_id = 3
+    octave_diff = octave_id - lilypond_default_octave_id
+    octave_sign = "'" if octave_diff >= 0 else ','
+    octave_info = "".join(octave_sign for _ in range(octave_diff))
+
+    start_time = piece_element.start_time
+    time_in_measure = start_time - floor(start_time)
+    if piece_element.duration == 1.0 and time_in_measure > 0:
+        remaining_duration = int(round(1 / (1 - time_in_measure)))
+        remaining_note = f"{pitch_class}{octave_info}{remaining_duration}~"
+        left_over_bar_duration = int(round(1 / time_in_measure))
+        left_over_note = f"{pitch_class}{octave_info}{left_over_bar_duration}"
+        return f"{remaining_note} {left_over_note}"
+    else:
+        duration = int(round((1 / piece_element.duration)))
+        note = f"{pitch_class}{octave_info}{duration}"
+        return note
+
+
 def create_lilypond_file_from_piece(piece: Piece, output_path: str) -> None:
     """
     Create text file in format of Lilypond sheet music editor.
@@ -283,32 +316,10 @@ def create_lilypond_file_from_piece(piece: Piece, output_path: str) -> None:
     indices = get_lilypond_order_of_voices(len(piece.melodic_lines))
     for index in indices:
         melodic_line = piece.melodic_lines[index]
-        current_time = 0
         lilypond_voice = []
         for piece_element in melodic_line:
-            pitch_class = piece_element.note[:-1]
-            pitch_class = pitch_class.replace('#', 'is').replace('b', 'es')
-            pitch_class = pitch_class.lower()
-
-            octave_id = int(piece_element.note[-1])
-            lilypond_default_octave_id = 3
-            octave_diff = octave_id - lilypond_default_octave_id
-            octave_sign = "'" if octave_diff >= 0 else ','
-            octave_info = "".join(octave_sign for _ in range(octave_diff))
-
-            time_in_measure = current_time - floor(current_time)
-            if piece_element.duration == 1.0 and time_in_measure > 0:
-                remaining_duration = int(round(1 / (1 - time_in_measure)))
-                note = f"{pitch_class}{octave_info}{remaining_duration}~"
-                lilypond_voice.append(note)
-                left_over_bar_duration = int(round(1 / time_in_measure))
-                note = f"{pitch_class}{octave_info}{left_over_bar_duration}"
-                lilypond_voice.append(note)
-            else:
-                duration = int(round((1 / piece_element.duration)))
-                note = f"{pitch_class}{octave_info}{duration}"
-                lilypond_voice.append(note)
-            current_time += piece_element.duration
+            note = convert_to_lilypond_note(piece_element)
+            lilypond_voice.append(note)
         lilypond_voice = " ".join(lilypond_voice)
         lilypond_voices.append(lilypond_voice)
     result = template.format(*lilypond_voices)
