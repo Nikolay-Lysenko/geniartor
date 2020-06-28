@@ -7,6 +7,9 @@ Author: Nikolay Lysenko
 
 import datetime
 import os
+import subprocess
+import traceback
+from math import floor
 from pkg_resources import resource_filename
 from typing import Any, Dict
 
@@ -178,9 +181,102 @@ def create_wav_from_events(events_path: str, output_path: str) -> None:
     write_timeline_to_wav(output_path, timeline, settings['frame_rate'])
 
 
+def create_lilypond_file_from_piece(piece: Piece, output_path: str) -> None:
+    """
+    Create text file in format of Lilypond sheet music editor.
+
+    :param piece:
+        `Piece` instance
+    :param output_path:
+        path where resulting file is going to be saved
+    :return:
+        None
+    """
+    template = (
+        "\\version \"2.18.2\"\n"
+        "\\layout {{\n"
+        "    indent = #0\n"
+        "}}\n"
+        "\\new StaffGroup <<\n"
+        "    \\new Staff <<\n"
+        "        \\clef treble\n"
+        "        \\time 4/4\n"
+        "        \\new Voice = \"first\"\n"
+        "            {{ \\voiceOne {}}}\n"
+        "        \\new Voice = \"second\"\n"
+        "            {{ \\voiceTwo {}}}\n"
+        "    >>\n"
+        "    \\new Staff <<\n"
+        "        \\clef bass\n"
+        "        \\time 4/4\n"
+        "        \\new Voice = \"third\"\n"
+        "            {{ \\voiceThree {}}}\n"
+        "        \\new Voice = \"fourth\"\n"
+        "            {{ \\voiceFour {}}}\n"
+        "    >>\n"
+        ">>"
+    )
+    lilypond_voices = []
+    for melodic_line in piece.melodic_lines[::-1]:
+        current_time = 0
+        lilypond_voice = []
+        for piece_element in melodic_line:
+            pitch_class = piece_element.note[:-1]
+            pitch_class = pitch_class.replace('#', 'is').replace('b', 'es')
+            pitch_class = pitch_class.lower()
+
+            octave_id = int(piece_element.note[-1])
+            lilypond_default_octave_id = 3
+            octave_diff = octave_id - lilypond_default_octave_id
+            octave_sign = "'" if octave_diff >= 0 else ','
+            octave_info = "".join(octave_sign for _ in range(octave_diff))
+
+            time_in_measure = current_time - floor(current_time)
+            if piece_element.duration == 1.0 and time_in_measure > 0:
+                remaining_duration = int(round(1 / (1 - time_in_measure)))
+                note = f"{pitch_class}{octave_info}{remaining_duration}~"
+                lilypond_voice.append(note)
+                left_over_bar_duration = int(round(1 / time_in_measure))
+                note = f"{pitch_class}{octave_info}{left_over_bar_duration}"
+                lilypond_voice.append(note)
+            else:
+                duration = int(round((1 / piece_element.duration)))
+                note = f"{pitch_class}{octave_info}{duration}"
+                lilypond_voice.append(note)
+            current_time += piece_element.duration
+        lilypond_voice = " ".join(lilypond_voice)
+        lilypond_voices.append(lilypond_voice)
+    result = template.format(*lilypond_voices)
+    with open(output_path, 'w') as out_file:
+        out_file.write(result)
+
+
+def create_pdf_sheet_music_with_lilypond(lilypond_path: str) -> None:
+    """
+    Create PDF file with sheet music.
+
+    :param lilypond_path:
+        path to a text file in Lilypond format
+    :return:
+        None:
+    """
+    dir_path, filename = os.path.split(lilypond_path)
+    bash_command = f"lilypond {filename}"
+    process = subprocess.Popen(
+        bash_command.split(),
+        cwd=dir_path,
+        stdout=subprocess.PIPE
+    )
+    try:
+        process.communicate()
+    except Exception:
+        print("Rendering sheet music to PDF failed. Do you have Lilypond?")
+        print(traceback.format_exc())
+
+
 def render(piece: Piece, rendering_params: Dict[str, Any]) -> None:
     """
-    Save piece to MIDI, TSV, and WAV files.
+    Save piece to MIDI, WAV, TSV, PDF, and Lilypond files.
 
     :param piece:
         `Piece` instance
@@ -209,3 +305,7 @@ def render(piece: Piece, rendering_params: Dict[str, Any]) -> None:
 
     wav_path = os.path.join(nested_dir, 'music.wav')
     create_wav_from_events(events_path, wav_path)
+
+    lilypond_path = os.path.join(nested_dir, 'sheet_music.ly')
+    create_lilypond_file_from_piece(piece, lilypond_path)
+    create_pdf_sheet_music_with_lilypond(lilypond_path)
