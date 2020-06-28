@@ -69,7 +69,7 @@ def create_midi_from_piece(
                 end=end_time
             )
             pretty_midi_instrument.notes.append(note)
-    pretty_midi_instrument.notes.sort(key=lambda x: x.start)
+    pretty_midi_instrument.notes.sort(key=lambda x: (x.start, x.pitch))
 
     trailing_silence_start = piece.n_measures * measure_in_seconds
     trailing_silence_start += opening_silence_in_seconds
@@ -192,30 +192,76 @@ def create_lilypond_file_from_piece(piece: Piece, output_path: str) -> None:
     :return:
         None
     """
-    template = (
+    preamble = (
         "\\version \"2.18.2\"\n"
         "\\layout {{\n"
         "    indent = #0\n"
         "}}\n"
-        "\\new StaffGroup <<\n"
-        "    \\new Staff <<\n"
-        "        \\clef treble\n"
-        "        \\time 4/4\n"
-        "        \\new Voice = \"first\"\n"
-        "            {{ \\voiceOne {}}}\n"
-        "        \\new Voice = \"second\"\n"
-        "            {{ \\voiceTwo {}}}\n"
-        "    >>\n"
-        "    \\new Staff <<\n"
-        "        \\clef bass\n"
-        "        \\time 4/4\n"
-        "        \\new Voice = \"third\"\n"
-        "            {{ \\voiceThree {}}}\n"
-        "        \\new Voice = \"fourth\"\n"
-        "            {{ \\voiceFour {}}}\n"
-        "    >>\n"
-        ">>"
     )
+    templates = {
+        2: (
+            "\\new StaffGroup <<\n"
+            "    \\new Staff <<\n"
+            "        \\clef treble\n"
+            "        \\time 4/4\n"
+            "        \\new Voice = \"first\"\n"
+            "            {{ \\voiceOne {}}}\n"
+            "    >>\n"
+            "    \\new Staff <<\n"
+            "        \\clef bass\n"
+            "        \\time 4/4\n"
+            "        \\new Voice = \"second\"\n"
+            "            {{ \\voiceTwo {}}}\n"
+            "    >>\n"
+            ">>"
+        ),
+        3: (
+            "\\new StaffGroup <<\n"
+            "    \\new Staff <<\n"
+            "        \\clef treble\n"
+            "        \\time 4/4\n"
+            "        \\new Voice = \"first\"\n"
+            "            {{ \\voiceOne {}}}\n"
+            "        \\new Voice = \"second\"\n"
+            "            {{ \\voiceTwo {}}}\n"
+            "    >>\n"
+            "    \\new Staff <<\n"
+            "        \\clef bass\n"
+            "        \\time 4/4\n"
+            "        \\new Voice = \"third\"\n"
+            "            {{ \\voiceThree {}}}\n"
+            "    >>\n"
+            ">>"
+        ),
+        4: (
+            "\\new StaffGroup <<\n"
+            "    \\new Staff <<\n"
+            "        \\clef treble\n"
+            "        \\time 4/4\n"
+            "        \\new Voice = \"first\"\n"
+            "            {{ \\voiceOne {}}}\n"
+            "        \\new Voice = \"second\"\n"
+            "            {{ \\voiceTwo {}}}\n"
+            "    >>\n"
+            "    \\new Staff <<\n"
+            "        \\clef bass\n"
+            "        \\time 4/4\n"
+            "        \\new Voice = \"third\"\n"
+            "            {{ \\voiceThree {}}}\n"
+            "        \\new Voice = \"fourth\"\n"
+            "            {{ \\voiceFour {}}}\n"
+            "    >>\n"
+            ">>"
+        ),
+    }
+    try:
+        template = preamble + templates[len(piece.melodic_lines)]
+    except KeyError:  # pragma: no cover
+        print(
+            f"Currently, rendering of {len(piece.melodic_lines)}-part "
+            f"compositions to Lilypond is not supported."
+        )
+        return
     lilypond_voices = []
     for melodic_line in piece.melodic_lines[::-1]:
         current_time = 0
@@ -251,7 +297,9 @@ def create_lilypond_file_from_piece(piece: Piece, output_path: str) -> None:
         out_file.write(result)
 
 
-def create_pdf_sheet_music_with_lilypond(lilypond_path: str) -> None:
+def create_pdf_sheet_music_with_lilypond(
+        lilypond_path: str
+) -> None:  # pragma: no cover
     """
     Create PDF file with sheet music.
 
@@ -274,7 +322,9 @@ def create_pdf_sheet_music_with_lilypond(lilypond_path: str) -> None:
         print(traceback.format_exc())
 
 
-def render(piece: Piece, rendering_params: Dict[str, Any]) -> None:
+def render(
+        piece: Piece, rendering_params: Dict[str, Any]
+) -> None:  # pragma: no cover
     """
     Save piece to MIDI, WAV, TSV, PDF, and Lilypond files.
 
