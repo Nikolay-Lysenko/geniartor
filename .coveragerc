@@ -1,0 +1,19 @@
+[run]
+branch = True
+source = geniartor
+
+[report]
+omit =
+    */__main__.py
+exclude_lines =
+    pragma: no cover
+    def __repr__
+    if .debug:
+    if __name__ == .__main__.:
+    raise AssertionError
+    raise NotImplementedError
+    raise RuntimeError
+    raise AttributeError
+    raise ValueError
+    raise TypeError
+    pass
