@@ -14,6 +14,7 @@ from geniartor.evaluation import (
     evaluate_absence_of_narrow_ranges,
     evaluate_absence_of_voice_crossing,
     evaluate_conjunct_motion,
+    evaluate_dominance_of_tertian_harmony,
     evaluate_harmonic_stability,
     evaluate_tonal_stability,
     rolling_aggregate
@@ -272,6 +273,59 @@ def test_evaluate_conjunct_motion(
         piece, penalty_deduction_per_line, n_semitones_to_penalty
     )
     assert round(result, 8) == expected
+
+
+@pytest.mark.parametrize(
+    "piece, expected",
+    [
+        (
+            # `piece`
+            Piece(
+                n_measures=2,
+                pitches=[
+                    ScaleElement('C4', 39, 23, 1),
+                    ScaleElement('D4', 41, 24, 2),
+                    ScaleElement('E4', 43, 25, 3),
+                    ScaleElement('F4', 44, 26, 4),
+                    ScaleElement('G4', 46, 27, 5),
+                    ScaleElement('A4', 48, 28, 6),
+                    ScaleElement('B4', 50, 29, 7),
+                    ScaleElement('C5', 51, 30, 1),
+                ],
+                melodic_lines=[
+                    [
+                        PieceElement('C4', 39, 23, 1, 0.0, 0.5),
+                        PieceElement('D4', 41, 24, 2, 0.5, 0.5),
+                        PieceElement('E4', 43, 25, 3, 1.0, 0.5),
+                        PieceElement('F4', 44, 26, 4, 1.5, 0.5),
+                    ],
+                    [
+                        PieceElement('E4', 43, 25, 3, 1.0, 1.0),
+                        PieceElement('G4', 46, 27, 5, 0.0, 1.0),
+                    ],
+                    [
+                        PieceElement('G4', 46, 27, 5, 0.0, 1.0),
+                        PieceElement('C5', 51, 30, 1, 1.0, 1.0),
+                    ],
+                ],
+                sonorities=[
+                    Sonority(0.0, 'beginning', [0, 0, 0]),
+                    Sonority(0.5, 'middle', [1, 0, 0]),
+                    Sonority(1.0, 'downbeat', [2, 1, 1]),
+                    Sonority(1.5, 'ending', [-1, -1, -1]),
+                ]
+            ),
+            # `expected`
+            -0.5
+        ),
+    ]
+)
+def test_evaluate_dominance_of_tertian_harmony(
+        piece: Piece, expected: float
+) -> None:
+    """Test `evaluate_dominance_of_tertian_harmony` function."""
+    result = evaluate_dominance_of_tertian_harmony(piece)
+    assert result == expected
 
 
 @pytest.mark.parametrize(

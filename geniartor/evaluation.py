@@ -154,6 +154,32 @@ def evaluate_conjunct_motion(
     return score
 
 
+def evaluate_dominance_of_tertian_harmony(piece: Piece) -> float:
+    """
+    Evaluate dominance of sonorities based on interval of a third.
+
+    :param piece:
+        `Piece` instance
+    :return:
+        fraction of non-tertian sonorities multiplied by -1
+    """
+    score = 0
+    circle_of_thirds = [1, 3, 5, 7, 2, 4, 6]
+    for sonority in piece.sonorities:
+        sonority_elements = convert_sonority_to_its_elements(
+            sonority, piece.melodic_lines
+        )
+        degrees = [x.degree for x in sonority_elements]
+        active_circle = [int(x in degrees) for x in circle_of_thirds]
+        shifted_active_circle = [active_circle[-1]] + active_circle[:-1]
+        zipped = zip(active_circle, shifted_active_circle)
+        n_changes = len([(x, y) for x, y in zipped if x != y])
+        if n_changes > 2:
+            score -= 1
+    score /= len(piece.sonorities)
+    return score
+
+
 def compute_harmonic_stability_of_sonority(
         sonority_elements: List[PieceElement],
         n_semitones_to_stability: Dict[int, float]
@@ -289,6 +315,7 @@ def get_scoring_functions_registry() -> Dict[str, Callable]:
         'absence_of_narrow_ranges': evaluate_absence_of_narrow_ranges,
         'absence_of_voice_crossing': evaluate_absence_of_voice_crossing,
         'conjunct_motion': evaluate_conjunct_motion,
+        'dominance_of_tertian_harmony': evaluate_dominance_of_tertian_harmony,
         'harmonic_stability': evaluate_harmonic_stability,
         'tonal_stability': evaluate_tonal_stability,
     }
