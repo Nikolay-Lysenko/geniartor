@@ -101,6 +101,56 @@ def evaluate_absence_of_narrow_ranges(
     return score
 
 
+def evaluate_absence_of_parallel_intervals(
+        piece: Piece, n_degrees_to_penalty: Dict[int, float]
+) -> float:
+    """
+    Evaluate absence of parallel intervals such as parallel fifths or octaves.
+
+    :param piece:
+        `Piece` instance
+    :param n_degrees_to_penalty:
+        mapping from size of parallel interval in degrees to penalty for it
+    :return:
+        average penalty over all pairs of successive sonorities
+    """
+    intervals = []
+    for sonority in piece.sonorities:
+        elements = convert_sonority_to_its_elements(
+            sonority, piece.melodic_lines
+        )
+        current_intervals = []
+        for lower_index, upper_index, lower_element, upper_element in zip(
+                sonority.indices, sonority.indices[1:], elements, elements[1:]
+        ):
+            n_degrees = (
+                upper_element.position_in_degrees
+                - lower_element.position_in_degrees
+            )
+            interval_info = {
+                'lower_index': lower_index,
+                'upper_index': upper_index,
+                'n_degrees': n_degrees,
+            }
+            current_intervals.append(interval_info)
+        intervals.append(current_intervals)
+
+    score = 0
+    for first, second in zip(intervals, intervals[1:]):
+        for first_info, second_info in zip(first, second):
+            same_interval = first_info['n_degrees'] == second_info['n_degrees']
+            other_lower_element = (
+                first_info['lower_index'] != second_info['lower_index']
+            )
+            other_upper_element = (
+                first_info['upper_index'] != second_info['upper_index']
+            )
+            if same_interval and other_lower_element and other_upper_element:
+                score -= n_degrees_to_penalty.get(first_info['n_degrees'], 0)
+    score /= len(piece.sonorities) - 1
+    return score
+
+
 def evaluate_absence_of_voice_crossing(piece: Piece) -> float:
     """
     Evaluate absence of voice crossing.
@@ -313,6 +363,7 @@ def get_scoring_functions_registry() -> Dict[str, Callable]:
     registry = {
         'absence_of_large_intervals': evaluate_absence_of_large_intervals,
         'absence_of_narrow_ranges': evaluate_absence_of_narrow_ranges,
+        'absence_of_parallel_intervals': evaluate_absence_of_parallel_intervals,
         'absence_of_voice_crossing': evaluate_absence_of_voice_crossing,
         'conjunct_motion': evaluate_conjunct_motion,
         'dominance_of_tertian_harmony': evaluate_dominance_of_tertian_harmony,

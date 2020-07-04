@@ -12,6 +12,7 @@ import pytest
 from geniartor.evaluation import (
     evaluate_absence_of_large_intervals,
     evaluate_absence_of_narrow_ranges,
+    evaluate_absence_of_parallel_intervals,
     evaluate_absence_of_voice_crossing,
     evaluate_conjunct_motion,
     evaluate_dominance_of_tertian_harmony,
@@ -164,6 +165,59 @@ def test_evaluate_absence_of_narrow_ranges(
 ) -> None:
     """Test `evaluate_absence_of_narrow_ranges` function."""
     result = evaluate_absence_of_narrow_ranges(piece, penalties, min_size)
+    assert result == expected
+
+
+@pytest.mark.parametrize(
+    "piece, n_degrees_to_penalty, expected",
+    [
+        (
+            # `piece`
+            Piece(
+                n_measures=2,
+                pitches=[
+                    ScaleElement('C4', 39, 23, 1),
+                    ScaleElement('D4', 41, 24, 2),
+                    ScaleElement('E4', 43, 25, 3),
+                    ScaleElement('F4', 44, 26, 4),
+                    ScaleElement('G4', 46, 27, 5),
+                    ScaleElement('A4', 48, 28, 6),
+                    ScaleElement('B4', 50, 29, 7),
+                    ScaleElement('C5', 51, 30, 1),
+                ],
+                melodic_lines=[
+                    [
+                        PieceElement('C4', 39, 23, 1, 0.0, 0.5),
+                        PieceElement('C4', 39, 23, 1, 0.5, 0.5),
+                        PieceElement('E4', 43, 25, 3, 1.0, 0.5),
+                        PieceElement('F4', 44, 26, 4, 1.5, 0.5),
+                    ],
+                    [
+                        PieceElement('G4', 46, 27, 5, 0.0, 1.0),
+                        PieceElement('B4', 50, 29, 7, 1.0, 1.0),
+                    ],
+                ],
+                sonorities=[
+                    Sonority(0.0, 'beginning', [0, 0]),
+                    Sonority(0.5, 'middle', [1, 0]),
+                    Sonority(1.0, 'downbeat', [2, 1]),
+                    Sonority(1.5, 'ending', [-1, -1]),
+                ]
+            ),
+            # `n_degrees_to_penalty`
+            {4: 0.5, 7: 1.0},
+            # `expected`
+            -0.5 / 3
+        ),
+    ]
+)
+def test_evaluate_absence_of_parallel_intervals(
+        piece: Piece, n_degrees_to_penalty: Dict[int, float], expected: float
+) -> None:
+    """Test `evaluate_absence_of_parallel_intervals` function."""
+    result = evaluate_absence_of_parallel_intervals(
+        piece, n_degrees_to_penalty
+    )
     assert result == expected
 
 
