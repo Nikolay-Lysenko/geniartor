@@ -16,7 +16,7 @@ branches:
   - develop
 
 script:
-  - pytest --cov=rlmusician --cov-config .coveragerc
+  - pytest --cov=geniartor --cov-config .coveragerc
 
 after_success:
   - codecov
