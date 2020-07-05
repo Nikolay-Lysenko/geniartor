@@ -29,8 +29,8 @@ def parse_cli_args() -> argparse.Namespace:
         help='path to configuration file'
     )
     parser.add_argument(
-        '-n', '--n_passes', type=int, default=5,
-        help='number of passes from all sonorities'
+        '-n', '--n_passes', type=int, default=3,
+        help='number of passes through all sonorities'
     )
     parser.add_argument(
         '-p', '--perturbation_probability', type=float, default=0.3,

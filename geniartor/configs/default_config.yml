@@ -67,18 +67,24 @@ evaluation:
   scoring_coefs:
     absence_of_large_intervals: 1
     absence_of_narrow_ranges: 1
+    absence_of_parallel_intervals: 1
     absence_of_voice_crossing: 1
     conjunct_motion: 1
+    dominance_of_tertian_harmony: 1
     harmonic_stability: 1
     tonal_stability: 1
   scoring_fn_params:
     absence_of_large_intervals:
       max_n_semitones: 16
     absence_of_narrow_ranges:
-      min_size: 9
+      range_size: 9
       penalties:
         2: 1
         3: 0.5
+    absence_of_parallel_intervals:
+      n_degrees_to_penalty:
+        4: 0.5
+        7: 1.0
     conjunct_motion:
       penalty_deduction_per_line: 1.0
       n_semitones_to_penalty:
