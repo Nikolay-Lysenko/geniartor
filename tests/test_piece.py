@@ -13,50 +13,17 @@ from geniartor.piece import (
     PieceElement,
     ScaleElement,
     Sonority,
-    convert_sonority_to_its_elements,
     create_diatonic_scale,
     find_sonorities,
     generate_line_durations,
     generate_random_piece,
+    get_elements_by_indices,
     select_appropriate_durations,
     slice_scale,
     update_current_measure_durations,
     validate_line_durations,
     validate_rhythm_arguments,
 )
-
-
-@pytest.mark.parametrize(
-    "sonority, melodic_lines, expected",
-    [
-        (
-            Sonority(0.5, 'middle', [1, 1]),
-            [
-                [
-                    PieceElement('C4', 39, 23, 1, 0.0, 0.5),
-                    PieceElement('C5', 51, 30, 1, 0.5, 0.5)
-                ],
-                [
-                    PieceElement('G4', 46, 27, 5, 0.0, 0.5),
-                    PieceElement('F4', 44, 26, 4, 0.5, 0.25),
-                    PieceElement('G4', 46, 27, 5, 0.75, 0.25),
-                ]
-            ],
-            [
-                 PieceElement('C5', 51, 30, 1, 0.5, 0.5),
-                 PieceElement('F4', 44, 26, 4, 0.5, 0.25),
-            ]
-        ),
-    ]
-)
-def test_convert_sonority_to_its_elements(
-        sonority: Sonority,
-        melodic_lines: List[List[PieceElement]],
-        expected: List[PieceElement]
-) -> None:
-    """Test `convert_sonority_to_its_elements` function."""
-    result = convert_sonority_to_its_elements(sonority, melodic_lines)
-    assert result == expected
 
 
 @pytest.mark.parametrize(
@@ -90,51 +57,197 @@ def test_create_diatonic_scale(
 
 
 @pytest.mark.parametrize(
-    "lines_durations, custom_position_types, expected",
+    "melodic_lines, custom_position_types, expected",
     [
         (
+            # `melodic_lines`
             [
-                [0.25, 0.125, 0.125, 0.25, 0.25],
-                [0.5, 0.25, 0.125, 0.125]
+                [
+                    PieceElement('C4', 39, 23, 1, 0.0, 0.25),
+                    PieceElement('C4', 39, 23, 1, 0.25, 0.125),
+                    PieceElement('C4', 39, 23, 1, 0.375, 0.125),
+                    PieceElement('C4', 39, 23, 1, 0.5, 0.25),
+                    PieceElement('C4', 39, 23, 1, 0.75, 0.25),
+                ],
+                [
+                    PieceElement('C4', 39, 23, 1, 0.0, 0.5),
+                    PieceElement('C4', 39, 23, 1, 0.5, 0.25),
+                    PieceElement('C4', 39, 23, 1, 0.75, 0.125),
+                    PieceElement('C4', 39, 23, 1, 0.875, 0.125),
+                ]
             ],
+            # `custom_position_types`
             {0.75: 'custom'},
+            # `expected`
             [
-                Sonority(0.0, 'beginning', [0, 0]),
-                Sonority(0.25, 'other', [1, 0]),
-                Sonority(0.375, 'other', [2, 0]),
-                Sonority(0.5, 'middle', [3, 1]),
-                Sonority(0.75, 'custom', [4, 2]),
-                Sonority(0.875, 'ending', [-1, -1]),
+                Sonority(
+                    [
+                        PieceElement('C4', 39, 23, 1, 0.0, 0.25),
+                        PieceElement('C4', 39, 23, 1, 0.0, 0.5),
+                    ],
+                    [0, 0],
+                    'beginning'
+                ),
+                Sonority(
+                    [
+                        PieceElement('C4', 39, 23, 1, 0.25, 0.125),
+                        PieceElement('C4', 39, 23, 1, 0.0, 0.5),
+                    ],
+                    [1, 0],
+                    'other'
+                ),
+                Sonority(
+                    [
+                        PieceElement('C4', 39, 23, 1, 0.375, 0.125),
+                        PieceElement('C4', 39, 23, 1, 0.0, 0.5),
+                    ],
+                    [2, 0],
+                    'other'
+                ),
+                Sonority(
+                    [
+                        PieceElement('C4', 39, 23, 1, 0.5, 0.25),
+                        PieceElement('C4', 39, 23, 1, 0.5, 0.25),
+                    ],
+                    [3, 1],
+                    'middle'
+                ),
+                Sonority(
+                    [
+                        PieceElement('C4', 39, 23, 1, 0.75, 0.25),
+                        PieceElement('C4', 39, 23, 1, 0.75, 0.125),
+                    ],
+                    [4, 2],
+                    'custom'
+                ),
+                Sonority(
+                    [
+                        PieceElement('C4', 39, 23, 1, 0.75, 0.25),
+                        PieceElement('C4', 39, 23, 1, 0.875, 0.125),
+                    ],
+                    [-1, -1],
+                    'ending'
+                ),
             ]
         ),
         (
+            # `melodic_lines`
             [
-                [0.5, 1.0, 0.5, 0.5, 0.25, 0.25],
-                [0.5, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.5, 0.5]
+                [
+                    PieceElement('C4', 39, 23, 1, 0.0, 0.5),
+                    PieceElement('C4', 39, 23, 1, 0.5, 1.0),
+                    PieceElement('C4', 39, 23, 1, 1.5, 0.5),
+                    PieceElement('C4', 39, 23, 1, 2.0, 0.5),
+                    PieceElement('C4', 39, 23, 1, 2.5, 0.25),
+                    PieceElement('C4', 39, 23, 1, 2.75, 0.25),
+                ],
+                [
+                    PieceElement('C4', 39, 23, 1, 0.0, 0.5),
+                    PieceElement('C4', 39, 23, 1, 0.5, 0.25),
+                    PieceElement('C4', 39, 23, 1, 0.75, 0.25),
+                    PieceElement('C4', 39, 23, 1, 1.0, 0.25),
+                    PieceElement('C4', 39, 23, 1, 1.25, 0.25),
+                    PieceElement('C4', 39, 23, 1, 1.5, 0.25),
+                    PieceElement('C4', 39, 23, 1, 1.75, 0.25),
+                    PieceElement('C4', 39, 23, 1, 2.0, 0.5),
+                    PieceElement('C4', 39, 23, 1, 2.5, 0.5),
+                ]
             ],
+            # `custom_position_types`
             None,
+            # `expected`
             [
-                Sonority(0.0, 'beginning', [0, 0]),
-                Sonority(0.5, 'middle', [1, 1]),
-                Sonority(0.75, 'other', [1, 2]),
-                Sonority(1.0, 'downbeat', [1, 3]),
-                Sonority(1.25, 'other', [1, 4]),
-                Sonority(1.5, 'middle', [2, 5]),
-                Sonority(1.75, 'other', [2, 6]),
-                Sonority(2.0, 'downbeat', [3, 7]),
-                Sonority(2.5, 'middle', [4, 8]),
-                Sonority(2.75, 'ending', [-1, -1])
+                Sonority(
+                    [
+                        PieceElement('C4', 39, 23, 1, 0.0, 0.5),
+                        PieceElement('C4', 39, 23, 1, 0.0, 0.5),
+                    ],
+                    [0, 0],
+                    'beginning'
+                ),
+                Sonority(
+                    [
+                        PieceElement('C4', 39, 23, 1, 0.5, 1.0),
+                        PieceElement('C4', 39, 23, 1, 0.5, 0.25),
+                    ],
+                    [1, 1],
+                    'middle'
+                ),
+                Sonority(
+                    [
+                        PieceElement('C4', 39, 23, 1, 0.5, 1.0),
+                        PieceElement('C4', 39, 23, 1, 0.75, 0.25),
+                    ],
+                    [1, 2],
+                    'other'
+                ),
+                Sonority(
+                    [
+                        PieceElement('C4', 39, 23, 1, 0.5, 1.0),
+                        PieceElement('C4', 39, 23, 1, 1.0, 0.25),
+                    ],
+                    [1, 3],
+                    'downbeat'
+                ),
+                Sonority(
+                    [
+                        PieceElement('C4', 39, 23, 1, 0.5, 1.0),
+                        PieceElement('C4', 39, 23, 1, 1.25, 0.25),
+                    ],
+                    [1, 4],
+                    'other'
+                ),
+                Sonority(
+                    [
+                        PieceElement('C4', 39, 23, 1, 1.5, 0.5),
+                        PieceElement('C4', 39, 23, 1, 1.5, 0.25),
+                    ],
+                    [2, 5],
+                    'middle'
+                ),
+                Sonority(
+                    [
+                        PieceElement('C4', 39, 23, 1, 1.5, 0.5),
+                        PieceElement('C4', 39, 23, 1, 1.75, 0.25),
+                    ],
+                    [2, 6],
+                    'other'
+                ),
+                Sonority(
+                    [
+                        PieceElement('C4', 39, 23, 1, 2.0, 0.5),
+                        PieceElement('C4', 39, 23, 1, 2.0, 0.5),
+                    ],
+                    [3, 7],
+                    'downbeat'
+                ),
+                Sonority(
+                    [
+                        PieceElement('C4', 39, 23, 1, 2.5, 0.25),
+                        PieceElement('C4', 39, 23, 1, 2.5, 0.5),
+                    ],
+                    [4, 8],
+                    'middle'
+                ),
+                Sonority(
+                    [
+                        PieceElement('C4', 39, 23, 1, 2.75, 0.25),
+                        PieceElement('C4', 39, 23, 1, 2.5, 0.5),
+                    ],
+                    [-1, -1],
+                    'ending'
+                ),
             ]
         ),
     ]
 )
 def test_find_sonorities(
-        lines_durations: List[List[float]],
+        melodic_lines: List[List[PieceElement]],
         custom_position_types: Optional[Dict[float, str]],
         expected: List[Sonority]
 ) -> None:
     """Test `find_sonorities` function."""
-    result = find_sonorities(lines_durations, custom_position_types)
+    result = find_sonorities(melodic_lines, custom_position_types)
     assert result == expected
 
 
@@ -210,6 +323,42 @@ def test_generate_random_piece(
         custom_position_types
     )
     assert piece.n_measures == n_measures
+
+
+@pytest.mark.parametrize(
+    "indices, melodic_lines, expected",
+    [
+        (
+            # `indices`
+            [1, 1],
+            # `melodic_lines`
+            [
+                [
+                    PieceElement('C4', 39, 23, 1, 0.0, 0.5),
+                    PieceElement('C5', 51, 30, 1, 0.5, 0.5)
+                ],
+                [
+                    PieceElement('G4', 46, 27, 5, 0.0, 0.5),
+                    PieceElement('F4', 44, 26, 4, 0.5, 0.25),
+                    PieceElement('G4', 46, 27, 5, 0.75, 0.25),
+                ]
+            ],
+            # `expected`
+            [
+                 PieceElement('C5', 51, 30, 1, 0.5, 0.5),
+                 PieceElement('F4', 44, 26, 4, 0.5, 0.25),
+            ]
+        ),
+    ]
+)
+def test_convert_sonority_to_its_elements(
+        indices: List[int],
+        melodic_lines: List[List[PieceElement]],
+        expected: List[PieceElement]
+) -> None:
+    """Test `convert_sonority_to_its_elements` function."""
+    result = get_elements_by_indices(indices, melodic_lines)
+    assert result == expected
 
 
 @pytest.mark.parametrize(

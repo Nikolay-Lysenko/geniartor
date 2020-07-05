@@ -6,7 +6,6 @@ Author: Nikolay Lysenko
 
 
 import random
-from itertools import accumulate
 from math import floor
 from typing import Dict, List, NamedTuple, Optional
 
@@ -35,10 +34,10 @@ class PieceElement(NamedTuple):
 
 
 class Sonority(NamedTuple):
-    """Simultaneously sounding pitches (as meta-information about them)."""
-    start_time: float
-    position_type: str
+    """Simultaneously sounding pitches."""
+    elements: List[PieceElement]
     indices: List[int]
+    position_type: str
 
 
 class Piece(NamedTuple):
@@ -325,23 +324,44 @@ def generate_random_line(
     return melodic_line
 
 
+def get_elements_by_indices(
+        indices: List[int],
+        melodic_lines: List[List[PieceElement]]
+) -> List[PieceElement]:
+    """
+    Get elements of piece by their positions in melodic lines.
+
+    :param indices:
+        positions of piece elements
+    :param melodic_lines:
+        lists of successive piece elements
+    :return:
+        piece elements
+    """
+    elements = [
+        melodic_line[index]
+        for melodic_line, index in zip(melodic_lines, indices)
+    ]
+    return elements
+
+
 def find_sonorities(
-        lines_durations: List[List[float]],
+        melodic_lines: List[List[PieceElement]],
         custom_position_types: Optional[Dict[float, str]] = None
 ) -> List[Sonority]:
     """
-    Find indices of all simultaneously sounding pitches.
+    Find all simultaneously sounding pitches.
 
-    :param lines_durations:
-        durations of notes (in fractions of whole measure) for each line
+    :param melodic_lines:
+        lists of successive piece elements
     :param custom_position_types:
         mapping from start time of sonority to its user-defined type
     :return:
-        indices of all simultaneously sounding pitches found in a piece
+        all simultaneously sounding pitches found in a piece
     """
     all_lines_start_times = [
-        [0.0] + list(accumulate(line_durations))[:-1]
-        for line_durations in lines_durations
+        [x.start_time for x in melodic_line]
+        for melodic_line in melodic_lines
     ]
     flat_start_times = [
         x
@@ -349,11 +369,11 @@ def find_sonorities(
         for x in line_start_times
     ]
     unique_start_times = sorted(list(set(flat_start_times)))
-    indices_in_lines = [0 for _ in lines_durations]
+    indices_in_lines = [0 for _ in melodic_lines]
     initial_sonority = Sonority(
-        start_time=0.0,
+        elements=get_elements_by_indices(indices_in_lines, melodic_lines),
+        indices=indices_in_lines,
         position_type='beginning',
-        indices=indices_in_lines
     )
     sonorities = [initial_sonority]
     custom_position_types = custom_position_types or {}
@@ -370,36 +390,20 @@ def find_sonorities(
             else index
             for index, line_start_times in zipped
         ]
-        sonority = Sonority(start_time, position_type, indices_in_lines)
+        sonority = Sonority(
+            get_elements_by_indices(indices_in_lines, melodic_lines),
+            indices_in_lines,
+            position_type,
+        )
         sonorities.append(sonority)
+    last_indices = [-1 for _ in melodic_lines]
     last_sonority = Sonority(
-        start_time=unique_start_times[-1],
+        elements=get_elements_by_indices(last_indices, melodic_lines),
+        indices=last_indices,
         position_type='ending',
-        indices=[-1 for _ in lines_durations]
     )
     sonorities.append(last_sonority)
     return sonorities
-
-
-def convert_sonority_to_its_elements(
-        sonority: Sonority,
-        melodic_lines: List[List[PieceElement]]
-) -> List[PieceElement]:
-    """
-    Convert sonority to exact values of its elements.
-
-    :param sonority:
-        data structure that keeps indices of simultaneously sounding pitches
-    :param melodic_lines:
-        lists of notes (with pitch, duration, and so on)
-    :return:
-        simultaneously sounding elements
-    """
-    sonority_as_elements = [
-        melodic_line[index]
-        for melodic_line, index in zip(melodic_lines, sonority.indices)
-    ]
-    return sonority_as_elements
 
 
 def generate_random_piece(
@@ -453,6 +457,6 @@ def generate_random_piece(
     for line_durations in lines_durations:
         melodic_line = generate_random_line(line_durations, pitches)
         melodic_lines.append(melodic_line)
-    sonorities = find_sonorities(lines_durations, custom_position_types)
+    sonorities = find_sonorities(melodic_lines, custom_position_types)
     piece = Piece(n_measures, pitches, melodic_lines, sonorities)
     return piece

@@ -53,10 +53,38 @@ from geniartor.piece import Piece, PieceElement, ScaleElement, Sonority
                     ],
                 ],
                 sonorities=[
-                    Sonority(0.0, 'beginning', [0, 0]),
-                    Sonority(0.5, 'middle', [1, 0]),
-                    Sonority(1.0, 'downbeat', [2, 1]),
-                    Sonority(1.5, 'ending', [-1, -1]),
+                    Sonority(
+                        [
+                            PieceElement('C4', 39, 23, 1, 0.0, 0.5),
+                            PieceElement('G4', 46, 27, 5, 0.0, 1.0),
+                        ],
+                        [0, 0],
+                        'beginning'
+                    ),
+                    Sonority(
+                        [
+                            PieceElement('D4', 41, 24, 2, 0.5, 0.5),
+                            PieceElement('G4', 46, 27, 5, 0.0, 1.0),
+                        ],
+                        [1, 0],
+                        'middle'
+                    ),
+                    Sonority(
+                        [
+                            PieceElement('E4', 43, 25, 3, 1.0, 0.5),
+                            PieceElement('C5', 51, 30, 1, 1.0, 1.0),
+                        ],
+                        [2, 1],
+                        'downbeat'
+                    ),
+                    Sonority(
+                        [
+                            PieceElement('F4', 44, 26, 4, 1.5, 0.5),
+                            PieceElement('C5', 51, 30, 1, 1.0, 1.0),
+                        ],
+                        [-1, -1],
+                        'ending'
+                    ),
                 ]
             ),
             # `max_n_semitones`
@@ -104,10 +132,38 @@ def test_evaluate_absence_of_large_intervals(
                     ],
                 ],
                 sonorities=[
-                    Sonority(0.0, 'beginning', [0, 0]),
-                    Sonority(0.5, 'middle', [1, 0]),
-                    Sonority(1.0, 'downbeat', [2, 1]),
-                    Sonority(1.5, 'ending', [-1, -1]),
+                    Sonority(
+                        [
+                            PieceElement('C4', 39, 23, 1, 0.0, 0.5),
+                            PieceElement('G4', 46, 27, 5, 0.0, 1.0),
+                        ],
+                        [0, 0],
+                        'beginning'
+                    ),
+                    Sonority(
+                        [
+                            PieceElement('D4', 41, 24, 2, 0.5, 0.5),
+                            PieceElement('G4', 46, 27, 5, 0.0, 1.0),
+                        ],
+                        [1, 0],
+                        'middle'
+                    ),
+                    Sonority(
+                        [
+                            PieceElement('E4', 43, 25, 3, 1.0, 0.5),
+                            PieceElement('C5', 51, 30, 1, 1.0, 1.0),
+                        ],
+                        [2, 1],
+                        'downbeat'
+                    ),
+                    Sonority(
+                        [
+                            PieceElement('F4', 44, 26, 4, 1.5, 0.5),
+                            PieceElement('C5', 51, 30, 1, 1.0, 1.0),
+                        ],
+                        [-1, -1],
+                        'ending'
+                    ),
                 ]
             ),
             # `penalties`
@@ -144,10 +200,38 @@ def test_evaluate_absence_of_large_intervals(
                     ],
                 ],
                 sonorities=[
-                    Sonority(0.0, 'beginning', [0, 0]),
-                    Sonority(0.5, 'middle', [1, 0]),
-                    Sonority(1.0, 'downbeat', [2, 1]),
-                    Sonority(1.5, 'ending', [-1, -1]),
+                    Sonority(
+                        [
+                            PieceElement('C4', 39, 23, 1, 0.0, 0.5),
+                            PieceElement('G4', 46, 27, 5, 0.0, 1.0),
+                        ],
+                        [0, 0],
+                        'beginning'
+                    ),
+                    Sonority(
+                        [
+                            PieceElement('D4', 41, 24, 2, 0.5, 0.5),
+                            PieceElement('G4', 46, 27, 5, 0.0, 1.0),
+                        ],
+                        [1, 0],
+                        'middle'
+                    ),
+                    Sonority(
+                        [
+                            PieceElement('C4', 39, 23, 1, 0.0, 0.5),
+                            PieceElement('C5', 51, 30, 1, 1.0, 1.0),
+                        ],
+                        [2, 1],
+                        'downbeat'
+                    ),
+                    Sonority(
+                        [
+                            PieceElement('D4', 41, 24, 2, 0.5, 0.5),
+                            PieceElement('C5', 51, 30, 1, 1.0, 1.0),
+                        ],
+                        [-1, -1],
+                        'ending'
+                    ),
                 ]
             ),
             # `penalties`
@@ -198,10 +282,38 @@ def test_evaluate_absence_of_narrow_ranges(
                     ],
                 ],
                 sonorities=[
-                    Sonority(0.0, 'beginning', [0, 0]),
-                    Sonority(0.5, 'middle', [1, 0]),
-                    Sonority(1.0, 'downbeat', [2, 1]),
-                    Sonority(1.5, 'ending', [-1, -1]),
+                    Sonority(
+                        [
+                            PieceElement('C4', 39, 23, 1, 0.0, 0.5),
+                            PieceElement('G4', 46, 27, 5, 0.0, 1.0),
+                        ],
+                        [0, 0],
+                        'beginning'
+                    ),
+                    Sonority(
+                        [
+                            PieceElement('C4', 39, 23, 1, 0.5, 0.5),
+                            PieceElement('G4', 46, 27, 5, 0.0, 1.0),
+                        ],
+                        [1, 0],
+                        'middle'
+                    ),
+                    Sonority(
+                        [
+                            PieceElement('E4', 43, 25, 3, 1.0, 0.5),
+                            PieceElement('B4', 50, 29, 7, 1.0, 1.0),
+                        ],
+                        [2, 1],
+                        'downbeat'
+                    ),
+                    Sonority(
+                        [
+                            PieceElement('F4', 44, 26, 4, 1.5, 0.5),
+                            PieceElement('B4', 50, 29, 7, 1.0, 1.0),
+                        ],
+                        [-1, -1],
+                        'ending'
+                    ),
                 ]
             ),
             # `n_degrees_to_penalty`
@@ -247,14 +359,42 @@ def test_evaluate_absence_of_parallel_intervals(
                     ],
                     [
                         PieceElement('G4', 46, 27, 5, 0.0, 1.0),
-                        PieceElement('C4', 39, 23, 1, 0.0, 0.5),
+                        PieceElement('C4', 39, 23, 1, 1.0, 0.5),
                     ],
                 ],
                 sonorities=[
-                    Sonority(0.0, 'beginning', [0, 0]),
-                    Sonority(0.5, 'middle', [1, 0]),
-                    Sonority(1.0, 'downbeat', [2, 1]),
-                    Sonority(1.5, 'ending', [-1, -1]),
+                    Sonority(
+                        [
+                            PieceElement('C4', 39, 23, 1, 0.0, 0.5),
+                            PieceElement('G4', 46, 27, 5, 0.0, 1.0),
+                        ],
+                        [0, 0],
+                        'beginning'
+                    ),
+                    Sonority(
+                        [
+                            PieceElement('D4', 41, 24, 2, 0.5, 0.5),
+                            PieceElement('G4', 46, 27, 5, 0.0, 1.0),
+                        ],
+                        [1, 0],
+                        'middle'
+                    ),
+                    Sonority(
+                        [
+                            PieceElement('E4', 43, 25, 3, 1.0, 0.5),
+                            PieceElement('C4', 39, 23, 1, 1.0, 1.0),
+                        ],
+                        [2, 1],
+                        'downbeat'
+                    ),
+                    Sonority(
+                        [
+                            PieceElement('F4', 44, 26, 4, 1.5, 0.5),
+                            PieceElement('C4', 39, 23, 1, 1.0, 1.0),
+                        ],
+                        [-1, -1],
+                        'ending'
+                    ),
                 ]
             ),
             # `expected`
@@ -300,10 +440,38 @@ def test_evaluate_absence_of_voice_crossing(
                     ],
                 ],
                 sonorities=[
-                    Sonority(0.0, 'beginning', [0, 0]),
-                    Sonority(0.5, 'middle', [1, 0]),
-                    Sonority(1.0, 'downbeat', [2, 1]),
-                    Sonority(1.5, 'ending', [-1, -1]),
+                    Sonority(
+                        [
+                            PieceElement('C4', 39, 23, 1, 0.0, 0.5),
+                            PieceElement('G4', 46, 27, 5, 0.0, 1.0),
+                        ],
+                        [0, 0],
+                        'beginning'
+                    ),
+                    Sonority(
+                        [
+                            PieceElement('D4', 41, 24, 2, 0.5, 0.5),
+                            PieceElement('G4', 46, 27, 5, 0.0, 1.0),
+                        ],
+                        [1, 0],
+                        'middle'
+                    ),
+                    Sonority(
+                        [
+                            PieceElement('E4', 43, 25, 3, 1.0, 0.5),
+                            PieceElement('C5', 51, 30, 1, 1.0, 1.0),
+                        ],
+                        [2, 1],
+                        'downbeat'
+                    ),
+                    Sonority(
+                        [
+                            PieceElement('F4', 44, 26, 4, 1.5, 0.5),
+                            PieceElement('C5', 51, 30, 1, 1.0, 1.0),
+                        ],
+                        [-1, -1],
+                        'ending'
+                    ),
                 ]
             ),
             # `penalty_deduction_per_line`
@@ -363,10 +531,42 @@ def test_evaluate_conjunct_motion(
                     ],
                 ],
                 sonorities=[
-                    Sonority(0.0, 'beginning', [0, 0, 0]),
-                    Sonority(0.5, 'middle', [1, 0, 0]),
-                    Sonority(1.0, 'downbeat', [2, 1, 1]),
-                    Sonority(1.5, 'ending', [-1, -1, -1]),
+                    Sonority(
+                        [
+                            PieceElement('C4', 39, 23, 1, 0.0, 0.5),
+                            PieceElement('E4', 43, 25, 3, 1.0, 1.0),
+                            PieceElement('G4', 46, 27, 5, 0.0, 1.0),
+                        ],
+                        [0, 0, 0],
+                        'beginning'
+                    ),
+                    Sonority(
+                        [
+                            PieceElement('D4', 41, 24, 2, 0.5, 0.5),
+                            PieceElement('E4', 43, 25, 3, 1.0, 1.0),
+                            PieceElement('G4', 46, 27, 5, 0.0, 1.0),
+                        ],
+                        [1, 0, 0],
+                        'middle'
+                    ),
+                    Sonority(
+                        [
+                            PieceElement('E4', 43, 25, 3, 1.0, 0.5),
+                            PieceElement('G4', 46, 27, 5, 0.0, 1.0),
+                            PieceElement('C5', 51, 30, 1, 1.0, 1.0),
+                        ],
+                        [2, 1, 1],
+                        'downbeat'
+                    ),
+                    Sonority(
+                        [
+                            PieceElement('F4', 44, 26, 4, 1.5, 0.5),
+                            PieceElement('G4', 46, 27, 5, 0.0, 1.0),
+                            PieceElement('C5', 51, 30, 1, 1.0, 1.0),
+                        ],
+                        [-1, -1, -1],
+                        'ending'
+                    ),
                 ]
             ),
             # `expected`
@@ -413,10 +613,38 @@ def test_evaluate_dominance_of_tertian_harmony(
                     ],
                 ],
                 sonorities=[
-                    Sonority(0.0, 'beginning', [0, 0]),
-                    Sonority(0.5, 'middle', [1, 0]),
-                    Sonority(1.0, 'downbeat', [2, 1]),
-                    Sonority(1.5, 'ending', [-1, -1]),
+                    Sonority(
+                        [
+                            PieceElement('C4', 39, 23, 1, 0.0, 0.5),
+                            PieceElement('G4', 46, 27, 5, 0.0, 1.0),
+                        ],
+                        [0, 0],
+                        'beginning'
+                    ),
+                    Sonority(
+                        [
+                            PieceElement('D4', 41, 24, 2, 0.5, 0.5),
+                            PieceElement('G4', 46, 27, 5, 0.0, 1.0),
+                        ],
+                        [1, 0],
+                        'middle'
+                    ),
+                    Sonority(
+                        [
+                            PieceElement('E4', 43, 25, 3, 1.0, 0.5),
+                            PieceElement('C5', 51, 30, 1, 1.0, 1.0),
+                        ],
+                        [2, 1],
+                        'downbeat'
+                    ),
+                    Sonority(
+                        [
+                            PieceElement('F4', 44, 26, 4, 1.5, 0.5),
+                            PieceElement('C5', 51, 30, 1, 1.0, 1.0),
+                        ],
+                        [-1, -1],
+                        'ending'
+                    ),
                 ]
             ),
             # `min_stabilities`
@@ -489,10 +717,38 @@ def test_evaluate_harmonic_stability(
                     ],
                 ],
                 sonorities=[
-                    Sonority(0.0, 'beginning', [0, 0]),
-                    Sonority(0.5, 'middle', [1, 0]),
-                    Sonority(1.0, 'downbeat', [2, 1]),
-                    Sonority(1.5, 'ending', [-1, -1]),
+                    Sonority(
+                        [
+                            PieceElement('C4', 39, 23, 1, 0.0, 0.5),
+                            PieceElement('G4', 46, 27, 5, 0.0, 1.0),
+                        ],
+                        [0, 0],
+                        'beginning'
+                    ),
+                    Sonority(
+                        [
+                            PieceElement('D4', 41, 24, 2, 0.5, 0.5),
+                            PieceElement('G4', 46, 27, 5, 0.0, 1.0),
+                        ],
+                        [1, 0],
+                        'middle'
+                    ),
+                    Sonority(
+                        [
+                            PieceElement('E4', 43, 25, 3, 1.0, 0.5),
+                            PieceElement('C5', 51, 30, 1, 1.0, 1.0),
+                        ],
+                        [2, 1],
+                        'downbeat'
+                    ),
+                    Sonority(
+                        [
+                            PieceElement('F4', 44, 26, 4, 1.5, 0.5),
+                            PieceElement('C5', 51, 30, 1, 1.0, 1.0),
+                        ],
+                        [-1, -1],
+                        'ending'
+                    ),
                 ]
             ),
             # `min_stabilities`

@@ -11,27 +11,34 @@ from copy import deepcopy
 from typing import Any, Dict, List
 
 from .evaluation import evaluate
-from .piece import Piece, PieceElement, ScaleElement
+from .piece import (
+    Piece,
+    PieceElement,
+    ScaleElement,
+    Sonority,
+    get_elements_by_indices
+)
 
 
 def set_new_values_for_sonority(
-        melodic_lines: List[List[PieceElement]],
-        indices: List[int],
+        piece: Piece,
+        sonority_position: int,
         new_values: List[ScaleElement]
 ) -> None:
     """
     Update elements forming a sonority.
 
-    :param melodic_lines:
-        lists of notes (with pitch, duration, and so on)
-    :param indices:
-        indices of the sonority elements within their lines
+    :param piece:
+        musical piece
+    :param sonority_position:
+        index of sonority to be updated
     :param new_values:
         new elements of the sonority
     :return:
         None
     """
-    zipped = zip(melodic_lines, indices, new_values)
+    indices = piece.sonorities[sonority_position].indices
+    zipped = zip(piece.melodic_lines, indices, new_values)
     for melodic_line, index, new_scale_element in zipped:
         old_piece_element = melodic_line[index]
         melodic_line[index] = PieceElement(
@@ -41,6 +48,13 @@ def set_new_values_for_sonority(
             degree=new_scale_element.degree,
             start_time=old_piece_element.start_time,
             duration=old_piece_element.duration
+        )
+    for position, old_sonority in enumerate(piece.sonorities):
+        indices = old_sonority.indices
+        piece.sonorities[position] = Sonority(
+            elements=get_elements_by_indices(indices, piece.melodic_lines),
+            indices=indices,
+            position_type=old_sonority.position_type
         )
 
 
@@ -52,7 +66,7 @@ def update_one_sonority(
     Replace particular sonority with locally the best one.
 
     :param result:
-        `Piece` instance and its evaluation score
+        musical piece and its total evaluation score
     :param sonority_position:
         index of sonority to be updated
     :param evaluation_params:
@@ -61,11 +75,10 @@ def update_one_sonority(
         piece with one modified sonority
     """
     piece = deepcopy(result['piece'])
-    indices = piece.sonorities[sonority_position].indices
     n_lines = len(piece.melodic_lines)
     alternatives = itertools.combinations(piece.pitches, n_lines)
     for alternative in alternatives:
-        set_new_values_for_sonority(piece.melodic_lines, indices, alternative)
+        set_new_values_for_sonority(piece, sonority_position, alternative)
         score = evaluate(piece, **evaluation_params)
         if score > result['score']:
             result = {'piece': deepcopy(piece), 'score': score}
@@ -77,7 +90,7 @@ def perturb(piece: Piece, perturbation_probability: float) -> Piece:
     Replace some sonorities with random sonorities.
 
     :param piece:
-        `Piece` instance
+        musical piece
     :param perturbation_probability:
         probability to replace sonority with a random sonority during
         perturbation stage
@@ -85,7 +98,7 @@ def perturb(piece: Piece, perturbation_probability: float) -> Piece:
         altered piece
     """
     weights = [perturbation_probability, 1 - perturbation_probability]
-    for sonority in piece.sonorities:
+    for sonority_position in range(len(piece.sonorities)):
         to_keep = random.choices([False, True], weights)[0]
         if to_keep:
             continue
@@ -94,7 +107,7 @@ def perturb(piece: Piece, perturbation_probability: float) -> Piece:
             key=lambda x: x.position_in_semitones
         )
         set_new_values_for_sonority(
-            piece.melodic_lines, sonority.indices, new_scale_elements
+            piece, sonority_position, new_scale_elements
         )
     return piece
 

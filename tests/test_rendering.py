@@ -49,10 +49,38 @@ from geniartor.rendering import (
                     ],
                 ],
                 sonorities=[
-                    Sonority(0.0, 'beginning', [0, 0]),
-                    Sonority(0.5, 'middle', [1, 0]),
-                    Sonority(1.0, 'downbeat', [2, 1]),
-                    Sonority(1.5, 'ending', [-1, -1]),
+                    Sonority(
+                        [
+                            PieceElement('C4', 39, 23, 1, 0.0, 0.5),
+                            PieceElement('G4', 46, 27, 5, 0.0, 1.0),
+                        ],
+                        [0, 0],
+                        'beginning'
+                    ),
+                    Sonority(
+                        [
+                            PieceElement('D4', 41, 24, 2, 0.5, 0.5),
+                            PieceElement('G4', 46, 27, 5, 0.0, 1.0),
+                        ],
+                        [1, 0],
+                        'middle'
+                    ),
+                    Sonority(
+                        [
+                            PieceElement('E4', 43, 25, 3, 1.0, 0.5),
+                            PieceElement('C5', 51, 30, 1, 1.0, 1.0),
+                        ],
+                        [2, 1],
+                        'downbeat'
+                    ),
+                    Sonority(
+                        [
+                            PieceElement('F4', 44, 26, 4, 1.5, 0.5),
+                            PieceElement('C5', 51, 30, 1, 1.0, 1.0),
+                        ],
+                        [-1, -1],
+                        'ending'
+                    ),
                 ]
             ),
             # `measure_in_seconds`
@@ -117,10 +145,38 @@ def test_create_events_from_piece(
                     ],
                 ],
                 sonorities=[
-                    Sonority(0.0, 'beginning', [0, 0]),
-                    Sonority(0.5, 'middle', [1, 0]),
-                    Sonority(1.0, 'downbeat', [2, 1]),
-                    Sonority(1.5, 'ending', [-1, -1]),
+                    Sonority(
+                        [
+                            PieceElement('C4', 39, 23, 1, 0.0, 0.5),
+                            PieceElement('G4', 46, 27, 5, 0.0, 1.0),
+                        ],
+                        [0, 0],
+                        'beginning'
+                    ),
+                    Sonority(
+                        [
+                            PieceElement('D4', 41, 24, 2, 0.5, 0.5),
+                            PieceElement('G4', 46, 27, 5, 0.0, 1.0),
+                        ],
+                        [1, 0],
+                        'middle'
+                    ),
+                    Sonority(
+                        [
+                            PieceElement('E4', 43, 25, 3, 1.0, 0.5),
+                            PieceElement('C5', 51, 30, 1, 1.0, 1.0),
+                        ],
+                        [2, 1],
+                        'downbeat'
+                    ),
+                    Sonority(
+                        [
+                            PieceElement('F4', 44, 26, 4, 1.5, 0.5),
+                            PieceElement('C5', 51, 30, 1, 1.0, 1.0),
+                        ],
+                        [-1, -1],
+                        'ending'
+                    ),
                 ]
             ),
             # `row_number`
@@ -155,10 +211,38 @@ def test_create_events_from_piece(
                     ],
                 ],
                 sonorities=[
-                    Sonority(0.0, 'beginning', [0, 0]),
-                    Sonority(0.5, 'middle', [1, 0]),
-                    Sonority(1.0, 'downbeat', [2, 1]),
-                    Sonority(1.5, 'ending', [-1, -1]),
+                    Sonority(
+                        [
+                            PieceElement('C4', 39, 23, 1, 0.0, 0.5),
+                            PieceElement('G4', 46, 27, 5, 0.0, 1.0),
+                        ],
+                        [0, 0],
+                        'beginning'
+                    ),
+                    Sonority(
+                        [
+                            PieceElement('D4', 41, 24, 2, 0.5, 0.5),
+                            PieceElement('G4', 46, 27, 5, 0.0, 1.0),
+                        ],
+                        [1, 0],
+                        'middle'
+                    ),
+                    Sonority(
+                        [
+                            PieceElement('E4', 43, 25, 3, 1.0, 0.5),
+                            PieceElement('C5', 51, 30, 1, 1.0, 1.0),
+                        ],
+                        [2, 1],
+                        'downbeat'
+                    ),
+                    Sonority(
+                        [
+                            PieceElement('F4', 44, 26, 4, 1.5, 0.5),
+                            PieceElement('C5', 51, 30, 1, 1.0, 1.0),
+                        ],
+                        [-1, -1],
+                        'ending'
+                    ),
                 ]
             ),
             # `row_number`
@@ -210,10 +294,38 @@ def test_create_lilypond_file_from_piece(
                     ],
                 ],
                 sonorities=[
-                    Sonority(0.0, 'beginning', [0, 0]),
-                    Sonority(0.5, 'middle', [1, 0]),
-                    Sonority(1.0, 'downbeat', [2, 1]),
-                    Sonority(1.5, 'ending', [-1, -1]),
+                    Sonority(
+                        [
+                            PieceElement('C4', 39, 23, 1, 0.0, 0.5),
+                            PieceElement('G4', 46, 27, 5, 0.0, 1.0),
+                        ],
+                        [0, 0],
+                        'beginning'
+                    ),
+                    Sonority(
+                        [
+                            PieceElement('D4', 41, 24, 2, 0.5, 0.5),
+                            PieceElement('G4', 46, 27, 5, 0.0, 1.0),
+                        ],
+                        [1, 0],
+                        'middle'
+                    ),
+                    Sonority(
+                        [
+                            PieceElement('E4', 43, 25, 3, 1.0, 0.5),
+                            PieceElement('C5', 51, 30, 1, 1.0, 1.0),
+                        ],
+                        [2, 1],
+                        'downbeat'
+                    ),
+                    Sonority(
+                        [
+                            PieceElement('F4', 44, 26, 4, 1.5, 0.5),
+                            PieceElement('C5', 51, 30, 1, 1.0, 1.0),
+                        ],
+                        [-1, -1],
+                        'ending'
+                    ),
                 ]
             ),
             # `note_number`

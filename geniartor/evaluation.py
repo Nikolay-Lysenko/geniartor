@@ -8,7 +8,7 @@ Author: Nikolay Lysenko
 from itertools import combinations
 from typing import Any, Callable, Dict, List
 
-from .piece import Piece, PieceElement, convert_sonority_to_its_elements
+from .piece import Piece, PieceElement
 
 
 N_SEMITONES_PER_OCTAVE = 12
@@ -21,7 +21,7 @@ def evaluate_absence_of_large_intervals(
     Evaluate absence of too large harmonic intervals between adjacent voices.
 
     :param piece:
-        `Piece` instance
+        musical piece
     :param max_n_semitones:
         maximum allowed interval in semitones between two
         simultaneously sounding pitches from adjacent voices
@@ -30,10 +30,7 @@ def evaluate_absence_of_large_intervals(
     """
     score = 0
     for sonority in piece.sonorities:
-        sonority_elements = convert_sonority_to_its_elements(
-            sonority, piece.melodic_lines
-        )
-        for first, second in zip(sonority_elements, sonority_elements[1:]):
+        for first, second in zip(sonority.elements, sonority.elements[1:]):
             first_pos = first.position_in_semitones
             second_pos = second.position_in_semitones
             if abs(second_pos - first_pos) > max_n_semitones:
@@ -77,7 +74,7 @@ def evaluate_absence_of_narrow_ranges(
     Evaluate melodic fluency based on absence of stalling within narrow ranges.
 
     :param piece:
-        `Piece` instance
+        musical piece
     :param penalties:
         mapping from width of a range (in scale degrees) to penalty
         applicable to ranges of not greater width
@@ -108,7 +105,7 @@ def evaluate_absence_of_parallel_intervals(
     Evaluate absence of parallel intervals such as parallel fifths or octaves.
 
     :param piece:
-        `Piece` instance
+        musical piece
     :param n_degrees_to_penalty:
         mapping from size of parallel interval in degrees to penalty for it
     :return:
@@ -116,12 +113,10 @@ def evaluate_absence_of_parallel_intervals(
     """
     intervals = []
     for sonority in piece.sonorities:
-        elements = convert_sonority_to_its_elements(
-            sonority, piece.melodic_lines
-        )
         current_intervals = []
         for lower_index, upper_index, lower_element, upper_element in zip(
-                sonority.indices, sonority.indices[1:], elements, elements[1:]
+                sonority.indices, sonority.indices[1:],
+                sonority.elements, sonority.elements[1:]
         ):
             n_degrees = (
                 upper_element.position_in_degrees
@@ -156,16 +151,13 @@ def evaluate_absence_of_voice_crossing(piece: Piece) -> float:
     Evaluate absence of voice crossing.
 
     :param piece:
-        `Piece` instance
+        musical piece
     :return:
         fraction of sonorities with voices in wrong order multiplied by -1
     """
     score = 0
     for sonority in piece.sonorities:
-        sonority_elements = convert_sonority_to_its_elements(
-            sonority, piece.melodic_lines
-        )
-        for first, second in zip(sonority_elements, sonority_elements[1:]):
+        for first, second in zip(sonority.elements, sonority.elements[1:]):
             if first.position_in_semitones >= second.position_in_semitones:
                 score -= 1
                 break
@@ -181,7 +173,7 @@ def evaluate_conjunct_motion(
     Evaluate presence of coherent melodic lines that move without leaps.
 
     :param piece:
-        `Piece` instance
+        `musical piece
     :param penalty_deduction_per_line:
         amount of leaps penalty that is deducted for each melodic line
     :param n_semitones_to_penalty:
@@ -209,17 +201,14 @@ def evaluate_dominance_of_tertian_harmony(piece: Piece) -> float:
     Evaluate dominance of sonorities based on interval of a third.
 
     :param piece:
-        `Piece` instance
+        musical piece
     :return:
         fraction of non-tertian sonorities multiplied by -1
     """
     score = 0
     circle_of_thirds = [1, 3, 5, 7, 2, 4, 6]
     for sonority in piece.sonorities:
-        sonority_elements = convert_sonority_to_its_elements(
-            sonority, piece.melodic_lines
-        )
-        degrees = [x.degree for x in sonority_elements]
+        degrees = [x.degree for x in sonority.elements]
         active_circle = [int(x in degrees) for x in circle_of_thirds]
         shifted_active_circle = [active_circle[-1]] + active_circle[:-1]
         zipped = zip(active_circle, shifted_active_circle)
@@ -266,7 +255,7 @@ def evaluate_harmonic_stability(
     Evaluate deviation of actual harmonic stability from its desired level.
 
     :param piece:
-        `Piece` instance
+        musical piece
     :param min_stabilities:
         mapping from type of sonority's start position to minimum
         sufficient stability
@@ -281,11 +270,8 @@ def evaluate_harmonic_stability(
     """
     score = 0
     for sonority in piece.sonorities:
-        sonority_elements = convert_sonority_to_its_elements(
-            sonority, piece.melodic_lines
-        )
         stability_of_current_sonority = compute_harmonic_stability_of_sonority(
-            sonority_elements, n_semitones_to_stability
+            sonority.elements, n_semitones_to_stability
         )
         min_stability = min_stabilities[sonority.position_type]
         score += min(stability_of_current_sonority - min_stability, 0)
@@ -324,7 +310,7 @@ def evaluate_tonal_stability(
     Evaluate deviation of actual tonal stability from its desired level.
 
     :param piece:
-        `Piece` instance
+        musical piece
     :param min_stabilities:
         mapping from type of sonority's start position to minimum
         sufficient stability
@@ -339,11 +325,8 @@ def evaluate_tonal_stability(
     """
     score = 0
     for sonority in piece.sonorities:
-        sonority_elements = convert_sonority_to_its_elements(
-            sonority, piece.melodic_lines
-        )
         stability_of_current_sonority = compute_tonal_stability_of_sonority(
-            sonority_elements, degree_to_stability
+            sonority.elements, degree_to_stability
         )
         min_stability = min_stabilities[sonority.position_type]
         score += min(stability_of_current_sonority - min_stability, 0)
@@ -383,7 +366,7 @@ def evaluate(
     Evaluate piece.
 
     :param piece:
-        `Piece` instance
+        musical piece
     :param scoring_coefs:
         mapping from scoring function names to their weights in final score
     :param scoring_fn_params:

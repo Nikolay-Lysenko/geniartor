@@ -37,7 +37,7 @@ def create_midi_from_piece(
     Create MIDI file from a piece created by this package.
 
     :param piece:
-        `Piece` instance
+        musical piece
     :param midi_path:
         path where resulting MIDI file is going to be saved
     :param measure_in_seconds:
@@ -101,7 +101,7 @@ def create_events_from_piece(
     Create TSV file with `sinethesizer` events from a piece.
 
     :param piece:
-        `Piece` instance
+        musical piece
     :param events_path:
         path to a file where result is going to be saved
     :param measure_in_seconds:
@@ -272,7 +272,7 @@ def convert_to_lilypond_note(piece_element: PieceElement) -> str:
     Convert `PieceElement` instance to note in Lilypond absolute notation.
 
     :param piece_element:
-        `PieceElement` instance
+        element of a musical piece
     :return:
         note in Lilypond absolute notation
     """
@@ -305,7 +305,7 @@ def create_lilypond_file_from_piece(piece: Piece, output_path: str) -> None:
     Create text file in format of Lilypond sheet music editor.
 
     :param piece:
-        `Piece` instance
+        musical piece
     :param output_path:
         path where resulting file is going to be saved
     :return:
@@ -359,7 +359,7 @@ def render(
     Save piece to MIDI, WAV, TSV, PDF, and Lilypond files.
 
     :param piece:
-        `Piece` instance
+        musical piece
     :param rendering_params:
         settings of piece saving
     :return:
