@@ -5,11 +5,12 @@ Author: Nikolay Lysenko
 """
 
 
-from typing import Callable, Dict, List
+from typing import Dict, List, Tuple
 
 import pytest
 
 from geniartor.evaluation import (
+    compute_rolling_extrema,
     evaluate_absence_of_large_intervals,
     evaluate_absence_of_narrow_ranges,
     evaluate_absence_of_parallel_intervals,
@@ -18,9 +19,27 @@ from geniartor.evaluation import (
     evaluate_dominance_of_tertian_harmony,
     evaluate_harmonic_stability,
     evaluate_tonal_stability,
-    rolling_aggregate
 )
 from geniartor.piece import Piece, PieceElement, ScaleElement, Sonority
+
+
+@pytest.mark.parametrize(
+    "values, window_size, expected",
+    [
+        (
+            [0, 5, 2, 1, -3, 6, 4, 7],
+            3,
+            [(0, 5), (1, 5), (-3, 2), (-3, 6), (-3, 6), (4, 7)]
+        ),
+    ]
+)
+def test_compute_rolling_extrema(
+        values: List[float], window_size: int,
+        expected: List[Tuple[float, float]]
+) -> None:
+    """Test `compute_rolling_extrema` function."""
+    result = compute_rolling_extrema(values, window_size)
+    assert result == expected
 
 
 @pytest.mark.parametrize(
@@ -786,18 +805,3 @@ def test_evaluate_tonal_stability(
         piece, min_stabilities, max_stabilities, degree_to_stability
     )
     assert round(result, 8) == expected
-
-
-@pytest.mark.parametrize(
-    "values, aggregation_fn, window_size, expected",
-    [
-        ([0, 5, 2, 1, -3, 6, 4, 7], min, 3, [0, 0, 0, 1, -3, -3, -3, 4]),
-    ]
-)
-def test_rolling_aggregate(
-        values: List[float], aggregation_fn: Callable[[List[float]], float],
-        window_size: int, expected: List[float]
-) -> None:
-    """Test `rolling_aggregate` function."""
-    result = rolling_aggregate(values, aggregation_fn, window_size)
-    assert result == expected

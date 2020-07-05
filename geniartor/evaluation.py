@@ -6,7 +6,7 @@ Author: Nikolay Lysenko
 
 
 from itertools import combinations
-from typing import Any, Callable, Dict, List
+from typing import Any, Callable, Dict, List, Tuple
 
 from .piece import Piece, PieceElement
 
@@ -40,35 +40,28 @@ def evaluate_absence_of_large_intervals(
     return score
 
 
-def rolling_aggregate(
-        values: List[float],
-        aggregation_fn: Callable[[List[float]], float],
-        window_size: int
-) -> List[float]:
+def compute_rolling_extrema(
+        values: List[float], window_size: int
+) -> List[Tuple[float, float]]:
     """
-    Compute rolling aggregate.
+    Compute rolling minima and rolling maxima.
 
     :param values:
         list of values to be aggregated
-    :param aggregation_fn:
-        aggregation function
     :param window_size:
         size of rolling window
     :return:
-        list of rolling aggregates
+        list of pairs of rolling extrema
     """
-    window = []
     results = []
-    for value in values:
-        if len(window) == window_size:
-            window.pop(0)
-        window.append(value)
-        results.append(aggregation_fn(window))
+    for k in range(window_size, len(values) + 1):
+        window = values[(k - window_size):k]
+        results.append((min(window), max(window)))
     return results
 
 
 def evaluate_absence_of_narrow_ranges(
-        piece: Piece, penalties: Dict[int, float], min_size: int = 9
+        piece: Piece, penalties: Dict[int, float], range_size: int = 9
 ) -> float:
     """
     Evaluate melodic fluency based on absence of stalling within narrow ranges.
@@ -78,17 +71,15 @@ def evaluate_absence_of_narrow_ranges(
     :param penalties:
         mapping from width of a range (in scale degrees) to penalty
         applicable to ranges of not greater width
-    :param min_size:
-        minimum size of narrow range (in line elements)
+    :param range_size:
+        size of ranges (in line elements) to be tested on narrowness
     :return:
         multiplied by -1 count of narrow ranges weighted based on their width
     """
     score = 0
     for melodic_line in piece.melodic_lines:
         pitches = [x.position_in_degrees for x in melodic_line]
-        rolling_mins = rolling_aggregate(pitches, min, min_size)[min_size-1:]
-        rolling_maxs = rolling_aggregate(pitches, max, min_size)[min_size-1:]
-        borders = zip(rolling_mins, rolling_maxs)
+        borders = compute_rolling_extrema(pitches, range_size)
         for lower_border, upper_border in borders:
             width = upper_border - lower_border
             curr_penalties = [v for k, v in penalties.items() if k >= width]
