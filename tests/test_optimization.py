@@ -17,7 +17,8 @@ from geniartor.piece import Piece, PieceElement, ScaleElement, Sonority
 
 
 @pytest.mark.parametrize(
-    "piece, evaluation_params, n_passes, perturbation_probability",
+    "piece, evaluation_params, "
+    "n_passes, fraction_to_try, perturbation_probability",
     [
         (
             # `piece`
@@ -120,6 +121,8 @@ from geniartor.piece import Piece, PieceElement, ScaleElement, Sonority
             },
             # `n_passes`
             10,
+            # `fraction_to_try`
+            0.9,
             # `perturbation_probability`
             0.5
         ),
@@ -127,11 +130,12 @@ from geniartor.piece import Piece, PieceElement, ScaleElement, Sonority
 )
 def test_run_variable_neighborhood_search(
         piece: Piece, evaluation_params: Dict[str, Any],
-        n_passes: int, perturbation_probability: float
+        n_passes: int, fraction_to_try: float, perturbation_probability: float
 ) -> None:
     """Test `run_variable_neighborhood_search` function."""
     run_variable_neighborhood_search(
-        piece, evaluation_params, n_passes, perturbation_probability
+        piece, evaluation_params,
+        n_passes, fraction_to_try, perturbation_probability
     )
 
 

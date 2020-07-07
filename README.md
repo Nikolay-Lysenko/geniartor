@@ -33,9 +33,10 @@ To create a new musical phrase, run:
 python -m geniartor \
     [-c path_to_config] \
     [-n number_of_search_passes] \
+    [-f fraction_of_neighborhood_elements_to_try] \
     [-p perturbation_probability]
 ```
 
-All three arguments are optional. [Default config](https://github.com/Nikolay-Lysenko/geniartor/blob/master/geniartor/configs/default_config.yml) is used if `-c` argument is not passed. Similarly, `-n` and `-p` options have reasonable defaults too. 
+All four arguments are optional. [Default config](https://github.com/Nikolay-Lysenko/geniartor/blob/master/geniartor/configs/default_config.yml) is used if `-c` argument is not passed. Similarly, `-n`, `-f`, and `-p` options have reasonable defaults too.
 
 Advanced usage is covered in a [guide](https://github.com/Nikolay-Lysenko/geniartor/blob/master/docs/user_guide.md).

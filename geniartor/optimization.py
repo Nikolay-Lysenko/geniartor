@@ -59,7 +59,9 @@ def set_new_values_for_sonority(
 
 
 def update_one_sonority(
-        result: Dict[str, Any], sonority_position: int,
+        result: Dict[str, Any],
+        sonority_position: int,
+        fraction_to_try: float,
         evaluation_params: Dict[str, Any]
 ) -> Dict[str, Any]:
     """
@@ -69,6 +71,8 @@ def update_one_sonority(
         musical piece and its total evaluation score
     :param sonority_position:
         index of sonority to be updated
+    :param fraction_to_try:
+        expected fraction of alternatives to be tried
     :param evaluation_params:
         settings of piece evaluation
     :return:
@@ -78,6 +82,8 @@ def update_one_sonority(
     n_lines = len(piece.melodic_lines)
     alternatives = itertools.combinations(piece.pitches, n_lines)
     for alternative in alternatives:
+        if random.random() > fraction_to_try:
+            continue
         set_new_values_for_sonority(piece, sonority_position, alternative)
         score = evaluate(piece, **evaluation_params)
         if score > result['score']:
@@ -113,8 +119,11 @@ def perturb(piece: Piece, perturbation_probability: float) -> Piece:
 
 
 def run_variable_neighborhood_search(
-        piece: Piece, evaluation_params: Dict[str, Any],
-        n_passes: int, perturbation_probability: float
+        piece: Piece,
+        evaluation_params: Dict[str, Any],
+        n_passes: int,
+        fraction_to_try: float,
+        perturbation_probability: float
 ) -> Piece:
     """
     Run Variable Neighborhood Search in order to find optimal piece.
@@ -125,6 +134,8 @@ def run_variable_neighborhood_search(
         settings of piece evaluation
     :param n_passes:
         number of passes through all neighborhoods
+    :param fraction_to_try:
+        expected fraction of alternatives to be tried
     :param perturbation_probability:
         probability to replace sonority with a random sonority during
         perturbation stage
@@ -137,7 +148,9 @@ def run_variable_neighborhood_search(
     result = {'piece': deepcopy(piece), 'score': initial_score}
     for pass_number in range(n_passes):
         for position in range(len(piece.sonorities)):
-            result = update_one_sonority(result, position, evaluation_params)
+            result = update_one_sonority(
+                result, position, fraction_to_try, evaluation_params
+            )
         print(f"Results after pass #{pass_number}:")
         evaluate(result['piece'], **evaluation_params, verbose=True)
         if result['score'] > best_result['score']:

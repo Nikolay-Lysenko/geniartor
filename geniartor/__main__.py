@@ -33,6 +33,12 @@ def parse_cli_args() -> argparse.Namespace:
         help='number of passes through all sonorities'
     )
     parser.add_argument(
+        '-f', '--fraction_to_try', type=float, default=0.5,
+        help='expected fraction of neighborhood elements to be tried; '
+             'the higher it is, the higher scores should be, but the longer '
+             'search lasts'
+    )
+    parser.add_argument(
         '-p', '--perturbation_probability', type=float, default=0.3,
         help='probability that sonority is replaced with a random sonority '
              'after a local optimum is reached'
@@ -56,6 +62,7 @@ def main() -> None:
         piece,
         settings['evaluation'],
         cli_args.n_passes,
+        cli_args.fraction_to_try,
         cli_args.perturbation_probability
     )
 
