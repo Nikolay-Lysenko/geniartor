@@ -94,8 +94,7 @@ def create_events_from_piece(
         volume: float,
         location: int = 0,
         effects: str = '',
-        opening_silence_in_seconds: int = 1,
-        trailing_silence_in_seconds: int = 1
+        opening_silence_in_seconds: int = 1
 ) -> None:
     """
     Create TSV file with `sinethesizer` events from a piece.
@@ -116,8 +115,6 @@ def create_events_from_piece(
         sound effects to be applied to the resulting event
     :param opening_silence_in_seconds:
         number of seconds with silence to add at the start of the composition
-    :param trailing_silence_in_seconds:
-        number of seconds with silence to add at the end of the composition
     :return:
         None
     """
@@ -138,13 +135,6 @@ def create_events_from_piece(
         for x in events
     ]
 
-    trailing_silence_start = piece.n_measures * measure_in_seconds
-    trailing_silence_start += opening_silence_in_seconds
-    events.append(
-        f"{timbre}\t{trailing_silence_start}\t{trailing_silence_in_seconds}\t"
-        f"A0\t0\t0\t"
-    )
-
     columns = [
         'timbre', 'start_time', 'duration', 'frequency',
         'volume', 'location', 'effects'
@@ -156,7 +146,9 @@ def create_events_from_piece(
             out_file.write(line + '\n')
 
 
-def create_wav_from_events(events_path: str, output_path: str) -> None:
+def create_wav_from_events(
+        events_path: str, output_path: str, trailing_silence_in_seconds: float
+) -> None:
     """
     Create WAV file based on `sinethesizer` TSV file.
 
@@ -164,6 +156,8 @@ def create_wav_from_events(events_path: str, output_path: str) -> None:
         path to TSV file with track represented as `sinethesizer` events
     :param output_path:
         path where resulting WAV file is going to be saved
+    :param trailing_silence_in_seconds:
+        number of seconds with silence to add at the end of the composition
     :return:
         None
     """
@@ -173,7 +167,7 @@ def create_wav_from_events(events_path: str, output_path: str) -> None:
     )
     settings = {
         'frame_rate': 44100,
-        'trailing_silence': 0.0,
+        'trailing_silence': trailing_silence_in_seconds,
         'max_channel_delay': 0.02,
         'timbres_registry': create_timbres_registry(presets_path)
     }
@@ -379,12 +373,13 @@ def render(
 
     events_path = os.path.join(nested_dir, 'sinethesizer_events.tsv')
     events_params = rendering_params['sinethesizer']
+    trailing_silence_in_sec = common_params.pop('trailing_silence_in_seconds')
     create_events_from_piece(
         piece, events_path, **events_params, **common_params
     )
 
     wav_path = os.path.join(nested_dir, 'music.wav')
-    create_wav_from_events(events_path, wav_path)
+    create_wav_from_events(events_path, wav_path, trailing_silence_in_sec)
 
     lilypond_path = os.path.join(nested_dir, 'sheet_music.ly')
     create_lilypond_file_from_piece(piece, lilypond_path)

@@ -105,8 +105,7 @@ def test_create_events_from_piece(
         measure_in_seconds=measure_in_seconds,
         timbre='default_timbre',
         volume=volume,
-        opening_silence_in_seconds=1,
-        trailing_silence_in_seconds=1
+        opening_silence_in_seconds=1
     )
     with open(path_to_tmp_file) as in_file:
         for i in range(row_number):
@@ -361,23 +360,26 @@ def test_create_midi_from_piece(
 
 
 @pytest.mark.parametrize(
-    "tsv_content",
+    "tsv_content, trailing_silence_in_seconds",
     [
         (
             [
                 "timbre\tstart_time\tduration\tfrequency\tvolume\tlocation\teffects",
                 "default_timbre\t1\t1\tA0\t1\t0\t",
                 'default_timbre\t2\t1\t1\t1\t0\t[{"name": "tremolo", "frequency": 1}]'
-            ]
+            ],
+            1.0
         )
     ]
 )
 def test_create_wav_from_events(
         path_to_tmp_file: str, path_to_another_tmp_file: str,
-        tsv_content: List[str]
+        tsv_content: List[str], trailing_silence_in_seconds: float
 ) -> None:
     """Test `create_wav_from_events` function."""
     with open(path_to_tmp_file, 'w') as tmp_tsv_file:
         for line in tsv_content:
             tmp_tsv_file.write(line + '\n')
-    create_wav_from_events(path_to_tmp_file, path_to_another_tmp_file)
+    create_wav_from_events(
+        path_to_tmp_file, path_to_another_tmp_file, trailing_silence_in_seconds
+    )
