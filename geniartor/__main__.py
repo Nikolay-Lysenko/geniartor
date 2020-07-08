@@ -29,19 +29,8 @@ def parse_cli_args() -> argparse.Namespace:
         help='path to configuration file'
     )
     parser.add_argument(
-        '-n', '--n_passes', type=int, default=3,
+        '-n', '--n_passes', type=int, default=None,
         help='number of passes through all sonorities'
-    )
-    parser.add_argument(
-        '-f', '--fraction_to_try', type=float, default=0.5,
-        help='expected fraction of neighborhood elements to be tried; '
-             'the higher it is, the higher scores should be, but the longer '
-             'search lasts'
-    )
-    parser.add_argument(
-        '-p', '--perturbation_probability', type=float, default=0.3,
-        help='probability that sonority is replaced with a random sonority '
-             'after a local optimum is reached'
     )
     cli_args = parser.parse_args()
     return cli_args
@@ -58,12 +47,11 @@ def main() -> None:
         settings = yaml.load(config_file, Loader=yaml.FullLoader)
 
     piece = generate_random_piece(**settings['piece'])
+
+    n_passes = cli_args.n_passes or settings['optimization']['n_passes']
+    settings['optimization']['n_passes'] = n_passes
     piece = run_variable_neighborhood_search(
-        piece,
-        settings['evaluation'],
-        cli_args.n_passes,
-        cli_args.fraction_to_try,
-        cli_args.perturbation_probability
+        piece, settings['evaluation'], **settings['optimization']
     )
 
     results_dir = settings['rendering']['dir']

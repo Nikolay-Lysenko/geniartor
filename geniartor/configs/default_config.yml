@@ -50,19 +50,6 @@ piece:
       - 1.0
   custom_position_types: {}
 
-rendering:
-  dir: geniartor_data
-  common:
-    measure_in_seconds: 2.0
-    opening_silence_in_seconds: 1.0
-    trailing_silence_in_seconds: 1.0
-  midi:
-    instrument: 0
-    velocity: 100
-  sinethesizer:
-    timbre: default_timbre
-    volume: 0.25
-
 evaluation:
   scoring_coefs:
     absence_of_large_intervals: 1
@@ -148,3 +135,21 @@ evaluation:
         5: 0.8
         6: 0.4
         7: 0.0
+
+optimization:
+  n_passes: 3
+  fraction_to_try: 0.5
+  perturbation_probability: 0.3
+
+rendering:
+  dir: geniartor_data
+  common:
+    measure_in_seconds: 2.0
+    opening_silence_in_seconds: 1.0
+    trailing_silence_in_seconds: 1.0
+  midi:
+    instrument: 0
+    velocity: 100
+  sinethesizer:
+    timbre: default_timbre
+    volume: 0.25
