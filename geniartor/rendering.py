@@ -203,23 +203,12 @@ def make_lilypond_template(n_voices: int) -> str:
         ">>"
     )
     voices = []
-    ordinals = [
-        "first", "second", "third", "fourth", "fifth", "sixth", "seventh",
-        "eighth", "ninth", "tenth", "eleventh", "twelfth"
-    ]
-    numbers = [
-        "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine",
-        "Ten", "Eleven", "Twelve"
-    ]
-    for ordinal, number, _ in zip(ordinals, numbers, range(n_voices)):
-        voices.append(
-            f"        \\new Voice = \"{ordinal}\"\n"
-            f"            {{{{ \\voice{number} {{}}}}}}\n"
-        )
+    for _ in range(n_voices):
+        voices.append(f"        {{{{{{}}}}}}\n")
     treble_bass_threshold = ceil(n_voices / 2)
     template = raw_template.format(
-        "".join(voices[:treble_bass_threshold]),
-        "".join(voices[treble_bass_threshold:])
+        "        \\\\\n".join(voices[:treble_bass_threshold]),
+        "        \\\\\n".join(voices[treble_bass_threshold:])
     )
     return template
 

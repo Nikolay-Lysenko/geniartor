@@ -139,6 +139,80 @@ def test_create_events_from_piece(
                         PieceElement('F4', 44, 26, 4, 1.5, 0.5),
                     ],
                     [
+                        PieceElement('E4', 43, 25, 3, 0.0, 1.0),
+                        PieceElement('G4', 46, 27, 5, 1.0, 1.0),
+                    ],
+                    [
+                        PieceElement('G4', 46, 27, 5, 0.0, 1.0),
+                        PieceElement('C5', 51, 30, 1, 1.0, 1.0),
+                    ],
+                ],
+                sonorities=[
+                    Sonority(
+                        [
+                            PieceElement('C4', 39, 23, 1, 0.0, 0.5),
+                            PieceElement('G4', 46, 27, 5, 0.0, 1.0),
+                        ],
+                        [0, 0],
+                        'beginning'
+                    ),
+                    Sonority(
+                        [
+                            PieceElement('D4', 41, 24, 2, 0.5, 0.5),
+                            PieceElement('G4', 46, 27, 5, 0.0, 1.0),
+                        ],
+                        [1, 0],
+                        'middle'
+                    ),
+                    Sonority(
+                        [
+                            PieceElement('E4', 43, 25, 3, 1.0, 0.5),
+                            PieceElement('C5', 51, 30, 1, 1.0, 1.0),
+                        ],
+                        [2, 1],
+                        'downbeat'
+                    ),
+                    Sonority(
+                        [
+                            PieceElement('F4', 44, 26, 4, 1.5, 0.5),
+                            PieceElement('C5', 51, 30, 1, 1.0, 1.0),
+                        ],
+                        [-1, -1],
+                        'ending'
+                    ),
+                ]
+            ),
+            # `row_number`
+            8,
+            # `expected`
+            "        {g'1 c''1}\n"
+        ),
+        (
+            # `piece`
+            Piece(
+                n_measures=2,
+                pitches=[
+                    ScaleElement('C4', 39, 23, 1),
+                    ScaleElement('D4', 41, 24, 2),
+                    ScaleElement('E4', 43, 25, 3),
+                    ScaleElement('F4', 44, 26, 4),
+                    ScaleElement('G4', 46, 27, 5),
+                    ScaleElement('A4', 48, 28, 6),
+                    ScaleElement('B4', 50, 29, 7),
+                    ScaleElement('C5', 51, 30, 1),
+                ],
+                melodic_lines=[
+                    [
+                        PieceElement('C4', 39, 23, 1, 0.0, 0.5),
+                        PieceElement('D4', 41, 24, 2, 0.5, 0.5),
+                        PieceElement('E4', 43, 25, 3, 1.0, 0.5),
+                        PieceElement('F4', 44, 26, 4, 1.5, 0.5),
+                    ],
+                    [
+                        PieceElement('E4', 43, 25, 3, 0.0, 1.0),
+                        PieceElement('G4', 46, 27, 5, 1.0, 1.0),
+                    ],
+                    [
                         PieceElement('G4', 46, 27, 5, 0.0, 1.0),
                         PieceElement('C5', 51, 30, 1, 1.0, 1.0),
                     ],
@@ -181,7 +255,77 @@ def test_create_events_from_piece(
             # `row_number`
             9,
             # `expected`
-            "            { \\voiceOne g'1 c''1}\n"
+            "        \\\\\n"
+        ),
+        (
+            # `piece`
+            Piece(
+                n_measures=2,
+                pitches=[
+                    ScaleElement('C4', 39, 23, 1),
+                    ScaleElement('D4', 41, 24, 2),
+                    ScaleElement('E4', 43, 25, 3),
+                    ScaleElement('F4', 44, 26, 4),
+                    ScaleElement('G4', 46, 27, 5),
+                    ScaleElement('A4', 48, 28, 6),
+                    ScaleElement('B4', 50, 29, 7),
+                    ScaleElement('C5', 51, 30, 1),
+                ],
+                melodic_lines=[
+                    [
+                        PieceElement('C4', 39, 23, 1, 0.0, 0.5),
+                        PieceElement('D4', 41, 24, 2, 0.5, 0.5),
+                        PieceElement('E4', 43, 25, 3, 1.0, 0.5),
+                        PieceElement('F4', 44, 26, 4, 1.5, 0.5),
+                    ],
+                    [
+                        PieceElement('E4', 43, 25, 3, 0.0, 1.0),
+                        PieceElement('G4', 46, 27, 5, 1.0, 1.0),
+                    ],
+                    [
+                        PieceElement('G4', 46, 27, 5, 0.0, 1.0),
+                        PieceElement('C5', 51, 30, 1, 1.0, 1.0),
+                    ],
+                ],
+                sonorities=[
+                    Sonority(
+                        [
+                            PieceElement('C4', 39, 23, 1, 0.0, 0.5),
+                            PieceElement('G4', 46, 27, 5, 0.0, 1.0),
+                        ],
+                        [0, 0],
+                        'beginning'
+                    ),
+                    Sonority(
+                        [
+                            PieceElement('D4', 41, 24, 2, 0.5, 0.5),
+                            PieceElement('G4', 46, 27, 5, 0.0, 1.0),
+                        ],
+                        [1, 0],
+                        'middle'
+                    ),
+                    Sonority(
+                        [
+                            PieceElement('E4', 43, 25, 3, 1.0, 0.5),
+                            PieceElement('C5', 51, 30, 1, 1.0, 1.0),
+                        ],
+                        [2, 1],
+                        'downbeat'
+                    ),
+                    Sonority(
+                        [
+                            PieceElement('F4', 44, 26, 4, 1.5, 0.5),
+                            PieceElement('C5', 51, 30, 1, 1.0, 1.0),
+                        ],
+                        [-1, -1],
+                        'ending'
+                    ),
+                ]
+            ),
+            # `row_number`
+            10,
+            # `expected`
+            "        {e'1 g'1}\n"
         ),
         (
             # `piece`
@@ -245,9 +389,9 @@ def test_create_events_from_piece(
                 ]
             ),
             # `row_number`
-            15,
+            13,
             # `expected`
-            "            { \\voiceTwo c'2 d'2~ d'2 e'4 f'4}\n"
+            "        {c'2 d'2~ d'2 e'4 f'4}\n"
         ),
     ]
 )
