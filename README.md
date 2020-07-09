@@ -35,6 +35,6 @@ python -m geniartor \
     [-n number_of_search_passes]
 ```
 
-Both arguments are optional. [Default config](https://github.com/Nikolay-Lysenko/geniartor/blob/master/geniartor/configs/default_config.yml) is used if `-c` argument is not passed. Similarly, `-n`, option has a reasonable default too.
+Both arguments are optional. [Default config](https://github.com/Nikolay-Lysenko/geniartor/blob/master/geniartor/configs/default_config.yml) is used if `-c` argument is not passed. Similarly, `-n` option has a reasonable default too.
 
 Advanced usage is covered in a [guide](https://github.com/Nikolay-Lysenko/geniartor/blob/master/docs/user_guide.md).
