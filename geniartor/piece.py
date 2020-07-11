@@ -16,7 +16,7 @@ NOTE_TO_POSITION = get_note_to_position_mapping()
 
 
 class ScaleElement(NamedTuple):
-    """A pitch from a scale."""
+    """A pitch from a diatonic scale."""
     note: str
     position_in_semitones: int
     position_in_degrees: int
@@ -41,7 +41,7 @@ class Sonority(NamedTuple):
 
 
 class Piece(NamedTuple):
-    """A musical piece based on diatonic scale."""
+    """A musical piece based on a diatonic scale."""
     n_measures: int
     pitches: List[ScaleElement]
     melodic_lines: List[List[PieceElement]]
@@ -81,7 +81,7 @@ def validate_line_durations(
         n_measures: int
 ) -> None:
     """
-    Check that line has proper duration and has valid rhythmic patterns.
+    Check that line has proper total duration and has valid rhythmic patterns.
 
     :param line_durations:
         durations of all notes from the line from its start to its finish
@@ -137,7 +137,7 @@ def validate_rhythm_arguments(
     :param n_measures:
         duration of a piece (in measures)
     :param duration_weights:
-        mapping of line element duration to weight of its random selection
+        mapping of line element duration to weight for its random selection
     :return:
         None
     """
@@ -199,7 +199,7 @@ def generate_line_durations(
     :param n_measures:
         total duration of a line (in measures)
     :param duration_weights:
-        mapping of line element duration to weight of its random selection
+        mapping of line element duration to weight for its random selection
     :param valid_rhythmic_patterns:
         list of all valid ways to split a measure duration into durations of
         its notes; every note duration must be given in fractions of measure
@@ -393,7 +393,7 @@ def find_sonorities(
         sonority = Sonority(
             get_elements_by_indices(indices_in_lines, melodic_lines),
             indices_in_lines,
-            position_type,
+            position_type
         )
         sonorities.append(sonority)
     last_indices = [-1 for _ in melodic_lines]
@@ -439,7 +439,7 @@ def generate_random_piece(
         there can be `None` values for some line, if so, durations for them
         are generated at random
     :param duration_weights:
-        mapping of line element duration to weight of its random selection
+        mapping of line element duration to weight for its random selection
     :param custom_position_types:
         mapping from start time of sonority to its user-defined type
     """

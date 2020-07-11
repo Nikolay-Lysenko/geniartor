@@ -63,10 +63,10 @@ def create_midi_from_piece(
             end_time = start_time + element.duration * measure_in_seconds
             pitch = element.position_in_semitones + numeration_shift
             note = pretty_midi.Note(
-                velocity=velocity,
-                pitch=pitch,
                 start=start_time,
-                end=end_time
+                end=end_time,
+                pitch=pitch,
+                velocity=velocity
             )
             pretty_midi_instrument.notes.append(note)
     pretty_midi_instrument.notes.sort(key=lambda x: (x.start, x.pitch))
@@ -202,9 +202,7 @@ def make_lilypond_template(n_voices: int) -> str:
         "    >>\n"
         ">>"
     )
-    voices = []
-    for _ in range(n_voices):
-        voices.append(f"        {{{{{{}}}}}}\n")
+    voices = ["        {{{}}}\n" for _ in range(n_voices)]
     treble_bass_threshold = ceil(n_voices / 2)
     template = raw_template.format(
         "        \\\\\n".join(voices[:treble_bass_threshold]),

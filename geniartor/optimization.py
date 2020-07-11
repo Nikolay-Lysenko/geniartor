@@ -135,7 +135,7 @@ def run_variable_neighborhood_search(
     :param n_passes:
         number of passes through all neighborhoods
     :param fraction_to_try:
-        expected fraction of alternatives to be tried
+        expected fraction of alternatives to be tried in each neighborhood
     :param perturbation_probability:
         probability to replace sonority with a random sonority during
         perturbation stage

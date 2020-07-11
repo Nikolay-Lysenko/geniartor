@@ -105,10 +105,11 @@ def evaluate_absence_of_parallel_intervals(
     intervals = []
     for sonority in piece.sonorities:
         current_intervals = []
-        for lower_index, upper_index, lower_element, upper_element in zip(
-                sonority.indices, sonority.indices[1:],
-                sonority.elements, sonority.elements[1:]
-        ):
+        zipped = zip(
+            sonority.indices, sonority.indices[1:],
+            sonority.elements, sonority.elements[1:]
+        )
+        for lower_index, upper_index, lower_element, upper_element in zipped:
             n_degrees = (
                 upper_element.position_in_degrees
                 - lower_element.position_in_degrees
@@ -161,7 +162,7 @@ def evaluate_conjunct_motion(
         n_semitones_to_penalty: Dict[int, float]
 ) -> float:
     """
-    Evaluate presence of coherent melodic lines that move without leaps.
+    Evaluate presence of coherent melodic lines that move almost without leaps.
 
     :param piece:
         `musical piece
