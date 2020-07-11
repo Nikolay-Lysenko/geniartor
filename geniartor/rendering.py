@@ -321,12 +321,12 @@ def create_pdf_sheet_music_with_lilypond(
     """
     dir_path, filename = os.path.split(lilypond_path)
     bash_command = f"lilypond {filename}"
-    process = subprocess.Popen(
-        bash_command.split(),
-        cwd=dir_path,
-        stdout=subprocess.PIPE
-    )
     try:
+        process = subprocess.Popen(
+            bash_command.split(),
+            cwd=dir_path,
+            stdout=subprocess.PIPE
+        )
         process.communicate()
     except Exception:
         print("Rendering sheet music to PDF failed. Do you have Lilypond?")
