@@ -109,7 +109,7 @@ def test_create_events_from_piece(
         piece,
         path_to_tmp_file,
         measure_in_seconds=measure_in_seconds,
-        timbre='default_timbre',
+        timbres=['default_timbre' for _ in piece.melodic_lines],
         volume=volume,
         opening_silence_in_seconds=1
     )
@@ -364,7 +364,7 @@ def test_create_lilypond_file_from_piece(
                 ]
             ),
             # `note_number`
-            3,
+            2,
             # `expected`
             {'pitch': 64, 'start': 2.0, 'end': 2.5}
         ),
@@ -379,7 +379,7 @@ def test_create_midi_from_piece(
         piece,
         path_to_tmp_file,
         measure_in_seconds=1,
-        instrument=0,
+        instruments=[0 for _ in piece.melodic_lines],
         velocity=100,
         opening_silence_in_seconds=1,
         trailing_silence_in_seconds=1

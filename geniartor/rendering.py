@@ -28,7 +28,7 @@ def create_midi_from_piece(
         piece: Piece,
         midi_path: str,
         measure_in_seconds: float,
-        instrument: int,
+        instruments: List[int],
         velocity: int,
         opening_silence_in_seconds: int = 1,
         trailing_silence_in_seconds: int = 1
@@ -42,9 +42,9 @@ def create_midi_from_piece(
         path where resulting MIDI file is going to be saved
     :param measure_in_seconds:
         duration of one measure in seconds
-    :param instrument:
-        for an instrument that plays the piece, its ID (number)
-        according to General MIDI specification
+    :param instruments:
+        IDs of instruments (according to General MIDI specification)
+        that play corresponding melodic lines
     :param velocity:
         one common velocity for all notes
     :param opening_silence_in_seconds:
@@ -55,8 +55,9 @@ def create_midi_from_piece(
         None
     """
     numeration_shift = pretty_midi.note_name_to_number('A0')
-    pretty_midi_instrument = pretty_midi.Instrument(program=instrument)
-    for melodic_line in piece.melodic_lines:
+    pretty_midi_instruments = []
+    for melodic_line, instrument in zip(piece.melodic_lines, instruments):
+        pretty_midi_instrument = pretty_midi.Instrument(program=instrument)
         for element in melodic_line:
             start_time = element.start_time * measure_in_seconds
             start_time += opening_silence_in_seconds
@@ -69,7 +70,8 @@ def create_midi_from_piece(
                 velocity=velocity
             )
             pretty_midi_instrument.notes.append(note)
-    pretty_midi_instrument.notes.sort(key=lambda x: (x.start, x.pitch))
+        pretty_midi_instrument.notes.sort(key=lambda x: (x.start, x.pitch))
+        pretty_midi_instruments.append(pretty_midi_instrument)
 
     trailing_silence_start = piece.n_measures * measure_in_seconds
     trailing_silence_start += opening_silence_in_seconds
@@ -79,10 +81,11 @@ def create_midi_from_piece(
         start=trailing_silence_start,
         end=trailing_silence_start + trailing_silence_in_seconds
     )
-    pretty_midi_instrument.notes.append(note)
+    pretty_midi_instruments[0].notes.append(note)
 
     composition = pretty_midi.PrettyMIDI()
-    composition.instruments.append(pretty_midi_instrument)
+    for pretty_midi_instrument in pretty_midi_instruments:
+        composition.instruments.append(pretty_midi_instrument)
     composition.write(midi_path)
 
 
@@ -90,7 +93,7 @@ def create_events_from_piece(
         piece: Piece,
         events_path: str,
         measure_in_seconds: float,
-        timbre: str,
+        timbres: List[str],
         volume: float,
         location: int = 0,
         effects: str = '',
@@ -105,8 +108,8 @@ def create_events_from_piece(
         path to a file where result is going to be saved
     :param measure_in_seconds:
         duration of one measure in seconds
-    :param timbre:
-        timbre to be used to play all notes
+    :param timbres:
+        timbres to be used to play corresponding melodic lines
     :param volume:
         relative volume of sound to be played
     :param location:
@@ -120,7 +123,7 @@ def create_events_from_piece(
     """
     all_notes = get_list_of_notes()
     events = []
-    for melodic_line in piece.melodic_lines:
+    for melodic_line, timbre in zip(piece.melodic_lines, timbres):
         for element in melodic_line:
             start_time = element.start_time * measure_in_seconds
             start_time += opening_silence_in_seconds
