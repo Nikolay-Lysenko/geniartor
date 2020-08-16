@@ -268,7 +268,7 @@ def convert_to_lilypond_note(piece_element: PieceElement) -> str:
     lilypond_default_octave_id = 3
     octave_diff = octave_id - lilypond_default_octave_id
     octave_sign = "'" if octave_diff >= 0 else ','
-    octave_info = "".join(octave_sign for _ in range(octave_diff))
+    octave_info = "".join(octave_sign for _ in range(abs(octave_diff)))
 
     start_time = piece_element.start_time
     time_in_measure = start_time - floor(start_time)

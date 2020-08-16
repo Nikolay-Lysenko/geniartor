@@ -287,6 +287,72 @@ def test_create_events_from_piece(
                 ">>"
             )
         ),
+        (
+            # `piece`
+            Piece(
+                n_measures=1,
+                pitches=[
+                    ScaleElement('C2', 15, 9, 1),
+                    ScaleElement('D2', 17, 10, 2),
+                    ScaleElement('E2', 19, 11, 3),
+                    ScaleElement('F2', 20, 12, 4),
+                ],
+                melodic_lines=[
+                    [
+                        PieceElement('C2', 15, 9, 1, 0.0, 0.5),
+                        PieceElement('D2', 17, 10, 2, 0.5, 0.5),
+                        PieceElement('E2', 19, 11, 3, 1.0, 0.5),
+                        PieceElement('F2', 20, 12, 4, 1.5, 0.5),
+                    ],
+                ],
+                sonorities=[
+                    Sonority(
+                        [
+                            PieceElement('C2', 15, 9, 1, 0.0, 0.5),
+                        ],
+                        [0],
+                        'beginning'
+                    ),
+                    Sonority(
+                        [
+                            PieceElement('D2', 17, 10, 2, 0.5, 0.5),
+                        ],
+                        [1],
+                        'middle'
+                    ),
+                    Sonority(
+                        [
+                            PieceElement('E2', 19, 11, 3, 1.0, 0.5),
+                        ],
+                        [2],
+                        'downbeat'
+                    ),
+                    Sonority(
+                        [
+                            PieceElement('F4', 20, 12, 4, 1.5, 0.5),
+                        ],
+                        [-1],
+                        'ending'
+                    ),
+                ]
+            ),
+            # `expected`
+            "\\version \"2.18.2\"\n"
+            "\\layout {\n"
+            "    indent = #0\n"
+            "}\n"
+            "\\new StaffGroup <<\n"
+            "    \\new Staff <<\n"
+            "        \\clef treble\n"
+            "        \\time 4/4\n"
+            "        {c,2 d,2 e,2 f,2}\n"
+            "    >>\n"
+            "    \\new Staff <<\n"
+            "        \\clef bass\n"
+            "        \\time 4/4\n"
+            "    >>\n"
+            ">>"
+        ),
     ]
 )
 def test_create_lilypond_file_from_piece(
