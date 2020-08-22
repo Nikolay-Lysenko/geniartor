@@ -1,8 +1,8 @@
 piece:
   tonic: C
   scale_type: major
-  lowest_note: C3
-  highest_note: C6
+  lowest_note: G2
+  highest_note: G5
   n_measures: 8
   lines_durations:
     - null
@@ -129,12 +129,12 @@ rendering:
       - 0
       - 0
       - 0
-      - 0
+      - 72
     velocity: 100
   sinethesizer:
     timbres:
-      - default_timbre
-      - default_timbre
-      - default_timbre
-      - default_timbre
+      - digital_piano_1
+      - digital_piano_1
+      - digital_piano_1
+      - clarinet_1
     volume: 0.25

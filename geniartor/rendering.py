@@ -19,7 +19,7 @@ from sinethesizer.io import (
     create_timbres_registry,
     write_timeline_to_wav
 )
-from sinethesizer.io.utils import get_list_of_notes
+from sinethesizer.utils.music_theory import get_list_of_notes
 
 from .piece import Piece, PieceElement
 

@@ -9,7 +9,7 @@ import random
 from math import floor
 from typing import Dict, List, NamedTuple, Optional
 
-from sinethesizer.io.utils import get_note_to_position_mapping
+from sinethesizer.utils.music_theory import get_note_to_position_mapping
 
 
 NOTE_TO_POSITION = get_note_to_position_mapping()
