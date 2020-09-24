@@ -129,12 +129,12 @@ rendering:
       - 0
       - 0
       - 0
-      - 72
+      - 0
     velocity: 100
   sinethesizer:
-    timbres:
-      - digital_piano_1
-      - digital_piano_1
-      - digital_piano_1
-      - clarinet_1
-    volume: 0.25
+    instruments:
+      - bell_like_bass
+      - lead
+      - lead
+      - lead
+    velocity: 1

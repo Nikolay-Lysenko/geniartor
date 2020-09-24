@@ -15,8 +15,9 @@ from typing import Any, Dict, List
 
 import pretty_midi
 from sinethesizer.io import (
-    convert_tsv_to_timeline,
-    create_timbres_registry,
+    convert_events_to_timeline,
+    convert_tsv_to_events,
+    create_instruments_registry,
     write_timeline_to_wav
 )
 from sinethesizer.utils.music_theory import get_list_of_notes
@@ -93,9 +94,8 @@ def create_events_from_piece(
         piece: Piece,
         events_path: str,
         measure_in_seconds: float,
-        timbres: List[str],
-        volume: float,
-        location: int = 0,
+        instruments: List[str],
+        velocity: float,
         effects: str = '',
         opening_silence_in_seconds: int = 1
 ) -> None:
@@ -108,12 +108,10 @@ def create_events_from_piece(
         path to a file where result is going to be saved
     :param measure_in_seconds:
         duration of one measure in seconds
-    :param timbres:
-        timbres to be used to play corresponding melodic lines
-    :param volume:
-        relative volume of sound to be played
-    :param location:
-        position of imaginary sound source
+    :param instruments:
+        names of instruments to be used to play corresponding melodic lines
+    :param velocity:
+        one common velocity for all notes
     :param effects:
         sound effects to be applied to the resulting event
     :param opening_silence_in_seconds:
@@ -123,7 +121,7 @@ def create_events_from_piece(
     """
     all_notes = get_list_of_notes()
     events = []
-    for melodic_line, timbre in zip(piece.melodic_lines, timbres):
+    for melodic_line, timbre in zip(piece.melodic_lines, instruments):
         for element in melodic_line:
             start_time = element.start_time * measure_in_seconds
             start_time += opening_silence_in_seconds
@@ -134,13 +132,13 @@ def create_events_from_piece(
             events.append(event)
     events = sorted(events, key=lambda x: (x[1], x[4], x[2]))
     events = [
-        f"{x[0]}\t{x[1]}\t{x[2]}\t{x[3]}\t{volume}\t{location}\t{effects}"
+        f"{x[0]}\t{x[1]}\t{x[2]}\t{x[3]}\t{velocity}\t{effects}"
         for x in events
     ]
 
     columns = [
-        'timbre', 'start_time', 'duration', 'frequency',
-        'volume', 'location', 'effects'
+        'instrument', 'start_time', 'duration', 'frequency',
+        'velocity', 'effects'
     ]
     header = '\t'.join(columns)
     results = [header] + events
@@ -171,10 +169,10 @@ def create_wav_from_events(
     settings = {
         'frame_rate': 44100,
         'trailing_silence': trailing_silence_in_seconds,
-        'max_channel_delay': 0.02,
-        'timbres_registry': create_timbres_registry(presets_path)
+        'instruments_registry': create_instruments_registry(presets_path)
     }
-    timeline = convert_tsv_to_timeline(events_path, settings)
+    events = convert_tsv_to_events(events_path, settings)
+    timeline = convert_events_to_timeline(events, settings)
     write_timeline_to_wav(output_path, timeline, settings['frame_rate'])
 
 
