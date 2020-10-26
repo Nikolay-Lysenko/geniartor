@@ -602,8 +602,7 @@ def test_evaluate_dominance_of_tertian_harmony(
 
 
 @pytest.mark.parametrize(
-    "piece, min_stabilities, max_stabilities, n_semitones_to_stability, "
-    "expected",
+    "piece, stability_ranges, n_semitones_to_stability, expected",
     [
         (
             # `piece`
@@ -666,21 +665,13 @@ def test_evaluate_dominance_of_tertian_harmony(
                     ),
                 ]
             ),
-            # `min_stabilities`
+            # `stability_ranges`
             {
-                'beginning': 0.5,
-                'downbeat': 0.7,
-                'middle': 0.5,
-                'other': 0.3,
-                'ending': 0.8,
-            },
-            # `max_stabilities`
-            {
-                'beginning': 0.8,
-                'downbeat': 1.0,
-                'middle': 0.9,
-                'other': 0.7,
-                'ending': 1.0,
+                'beginning': (0.5, 0.8),
+                'downbeat': (0.7, 1.0),
+                'middle': (0.5, 0.9),
+                'other': (0.3, 0.7),
+                'ending': (0.8, 1.0),
             },
             # `n_semitones_to_stability`
             {
@@ -694,20 +685,19 @@ def test_evaluate_dominance_of_tertian_harmony(
 )
 def test_evaluate_harmonic_stability(
         piece: Piece,
-        min_stabilities: Dict[str, float],
-        max_stabilities: Dict[str, float],
+        stability_ranges: Dict[str, Tuple[float, float]],
         n_semitones_to_stability: Dict[int, float],
         expected: float
 ) -> None:
     """Test `evaluate_harmonic_stability` function."""
     result = evaluate_harmonic_stability(
-        piece, min_stabilities, max_stabilities, n_semitones_to_stability
+        piece, stability_ranges, n_semitones_to_stability
     )
     assert round(result, 8) == expected
 
 
 @pytest.mark.parametrize(
-    "piece, min_stabilities, max_stabilities, degree_to_stability, expected",
+    "piece, stability_ranges, degree_to_stability, expected",
     [
         (
             # `piece`
@@ -770,21 +760,13 @@ def test_evaluate_harmonic_stability(
                     ),
                 ]
             ),
-            # `min_stabilities`
+            # `stability_ranges`
             {
-                'beginning': 0.5,
-                'downbeat': 0.7,
-                'middle': 0.5,
-                'other': 0.3,
-                'ending': 0.8,
-            },
-            # `max_stabilities`
-            {
-                'beginning': 0.8,
-                'downbeat': 1.0,
-                'middle': 0.9,
-                'other': 0.7,
-                'ending': 1.0,
+                'beginning': (0.5, 0.8),
+                'downbeat': (0.7, 1.0),
+                'middle': (0.5, 0.9),
+                'other': (0.3, 0.7),
+                'ending': (0.8, 1.0),
             },
             # `degree_to_stability`
             {1: 1.0, 2: 0.4, 3: 0.7, 4: 0.4, 5: 0.8, 6: 0.4, 7: 0.0},
@@ -795,13 +777,12 @@ def test_evaluate_harmonic_stability(
 )
 def test_evaluate_tonal_stability(
         piece: Piece,
-        min_stabilities: Dict[str, float],
-        max_stabilities: Dict[str, float],
+        stability_ranges: Dict[str, Tuple[float, float]],
         degree_to_stability: Dict[int, float],
         expected: float
 ) -> None:
     """Test `evaluate_tonal_stability` function."""
     result = evaluate_tonal_stability(
-        piece, min_stabilities, max_stabilities, degree_to_stability
+        piece, stability_ranges, degree_to_stability
     )
     assert round(result, 8) == expected

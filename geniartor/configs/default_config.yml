@@ -66,18 +66,12 @@ evaluation:
         11: 0.9
         12: 1.0
     harmonic_stability:
-      min_stabilities:
-        beginning: 0.8
-        ending: 0.9
-        downbeat: 0.75
-        middle: 0.5
-        other: 0.25
-      max_stabilities:
-        beginning: 1.0
-        ending: 1.0
-        downbeat: 1.0
-        middle: 0.9
-        other: 0.8
+      stability_ranges:
+        beginning: [0.8, 1.0]
+        ending: [0.9, 1.0]
+        downbeat: [0.75, 1.0]
+        middle: [0.5, 0.9]
+        other: [0.25, 0.8]
       n_semitones_to_stability:
         0: 1.0
         1: 0.2
@@ -92,18 +86,12 @@ evaluation:
         10: 0.2
         11: 0.2
     tonal_stability:
-      min_stabilities:
-        beginning: 0.7
-        ending: 0.9
-        downbeat: 0.7
-        middle: 0.5
-        other: 0.2
-      max_stabilities:
-        beginning: 1.0
-        ending: 1.0
-        downbeat: 1.0
-        middle: 0.9
-        other: 0.8
+      stability_ranges:
+        beginning: [0.7, 1.0]
+        ending: [0.9, 1.0]
+        downbeat: [0.7, 1.0]
+        middle: [0.5, 0.9]
+        other: [0.2, 0.8]
       degree_to_stability:
         1: 1.0
         2: 0.4
@@ -137,4 +125,4 @@ rendering:
       - sawtooth_with_filter_envelope
       - sawtooth_with_filter_envelope
       - sawtooth_with_filter_envelope
-    velocity: 1
+    velocity: 1.0

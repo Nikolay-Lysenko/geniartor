@@ -239,8 +239,7 @@ def compute_harmonic_stability_of_sonority(
 
 def evaluate_harmonic_stability(
         piece: Piece,
-        min_stabilities: Dict[str, float],
-        max_stabilities: Dict[str, float],
+        stability_ranges: Dict[str, Tuple[float, float]],
         n_semitones_to_stability: Dict[int, float]
 ) -> float:
     """
@@ -248,12 +247,9 @@ def evaluate_harmonic_stability(
 
     :param piece:
         musical piece
-    :param min_stabilities:
-        mapping from type of sonority's start position to minimum
-        sufficient stability
-    :param max_stabilities:
-        mapping from type of sonority's start position to maximum
-        desired stability
+    :param stability_ranges
+        mapping from type of sonority's start position to a pair of
+        minimum desired stability and maximum desired stability
     :param n_semitones_to_stability:
         mapping from interval size in semitones to its harmonic stability
     :return:
@@ -265,9 +261,9 @@ def evaluate_harmonic_stability(
         stability_of_current_sonority = compute_harmonic_stability_of_sonority(
             sonority.elements, n_semitones_to_stability
         )
-        min_stability = min_stabilities[sonority.position_type]
+        min_stability = stability_ranges[sonority.position_type][0]
         score += min(stability_of_current_sonority - min_stability, 0)
-        max_stability = max_stabilities[sonority.position_type]
+        max_stability = stability_ranges[sonority.position_type][1]
         score += min(max_stability - stability_of_current_sonority, 0)
     score /= len(piece.sonorities)
     return score
@@ -294,8 +290,7 @@ def compute_tonal_stability_of_sonority(
 
 def evaluate_tonal_stability(
         piece: Piece,
-        min_stabilities: Dict[str, float],
-        max_stabilities: Dict[str, float],
+        stability_ranges: Dict[str, Tuple[float, float]],
         degree_to_stability: Dict[int, float]
 ) -> float:
     """
@@ -303,12 +298,9 @@ def evaluate_tonal_stability(
 
     :param piece:
         musical piece
-    :param min_stabilities:
-        mapping from type of sonority's start position to minimum
-        sufficient stability
-    :param max_stabilities:
-        mapping from type of sonority's start position to maximum
-        desired stability
+    :param stability_ranges
+        mapping from type of sonority's start position to a pair of
+        minimum desired stability and maximum desired stability
     :param degree_to_stability:
         mapping from scale degree to its tonal stability
     :return:
@@ -320,9 +312,9 @@ def evaluate_tonal_stability(
         stability_of_current_sonority = compute_tonal_stability_of_sonority(
             sonority.elements, degree_to_stability
         )
-        min_stability = min_stabilities[sonority.position_type]
+        min_stability = stability_ranges[sonority.position_type][0]
         score += min(stability_of_current_sonority - min_stability, 0)
-        max_stability = max_stabilities[sonority.position_type]
+        max_stability = stability_ranges[sonority.position_type][1]
         score += min(max_stability - stability_of_current_sonority, 0)
     score /= len(piece.sonorities)
     return score

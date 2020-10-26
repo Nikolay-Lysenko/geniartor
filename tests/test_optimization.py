@@ -88,19 +88,12 @@ from geniartor.piece import Piece, PieceElement, ScaleElement, Sonority
                 },
                 'scoring_fn_params': {
                     'harmonic_stability': {
-                        'min_stabilities': {
-                            'beginning': 0.8,
-                            'ending': 0.9,
-                            'downbeat': 0.75,
-                            'middle': 0.5,
-                            'other': 0.25,
-                        },
-                        'max_stabilities': {
-                            'beginning': 1.0,
-                            'ending': 1.0,
-                            'downbeat': 1.0,
-                            'middle': 0.9,
-                            'other': 0.8,
+                        'stability_ranges': {
+                            'beginning': (0.8, 1.0),
+                            'ending': (0.9, 1.0),
+                            'downbeat': (0.75, 1.0),
+                            'middle': (0.5, 0.9),
+                            'other': (0.25, 0.8),
                         },
                         'n_semitones_to_stability': {
                             0: 1.0,
