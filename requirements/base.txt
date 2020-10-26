@@ -1,4 +1,4 @@
 -c constraints.txt
 pretty-midi==0.2.9
 PyYAML==5.3.1
-sinethesizer==0.4.0
+sinethesizer==0.5.0

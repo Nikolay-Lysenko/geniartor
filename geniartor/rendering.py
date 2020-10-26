@@ -20,6 +20,7 @@ from sinethesizer.io import (
     create_instruments_registry,
     write_timeline_to_wav
 )
+from sinethesizer.synth.core import Instrument
 from sinethesizer.utils.music_theory import get_list_of_notes
 
 from .piece import Piece, PieceElement
@@ -147,8 +148,35 @@ def create_events_from_piece(
             out_file.write(line + '\n')
 
 
+def create_sinethesizer_instruments(
+        n_melodic_lines: int
+) -> Dict[str, Instrument]:
+    """
+    Create registry of `sinethesizer` instruments with adjusted amplitudes.
+
+    :param n_melodic_lines:
+        number of melodic lines in a piece
+    :return:
+        mapping from instrument names to instruments itself
+    """
+    presets_path = resource_filename(
+        'geniartor', 'configs/sinethesizer_presets.yml'
+    )
+    instruments_registry = create_instruments_registry(presets_path)
+    normalized_registry = {}
+    for name, instrument in instruments_registry.items():
+        amplitude_scaling = instrument.amplitude_scaling
+        amplitude_scaling /= n_melodic_lines
+        normalized_registry[name] = Instrument(
+            instrument.partials, amplitude_scaling, instrument.effects
+        )
+    return normalized_registry
+
+
 def create_wav_from_events(
-        events_path: str, output_path: str, trailing_silence_in_seconds: float
+        events_path: str, output_path: str,
+        instruments_registry: Dict[str, Instrument],
+        trailing_silence_in_seconds: float
 ) -> None:
     """
     Create WAV file based on `sinethesizer` TSV file.
@@ -157,19 +185,17 @@ def create_wav_from_events(
         path to TSV file with track represented as `sinethesizer` events
     :param output_path:
         path where resulting WAV file is going to be saved
+    :param instruments_registry:
+        mapping from instrument names to instruments itself
     :param trailing_silence_in_seconds:
         number of seconds with silence to add at the end of the composition
     :return:
         None
     """
-    presets_path = resource_filename(
-        'geniartor',
-        'configs/sinethesizer_presets.yml'
-    )
     settings = {
-        'frame_rate': 44100,
+        'frame_rate': 48000,
         'trailing_silence': trailing_silence_in_seconds,
-        'instruments_registry': create_instruments_registry(presets_path)
+        'instruments_registry': instruments_registry,
     }
     events = convert_tsv_to_events(events_path, settings)
     timeline = convert_events_to_timeline(events, settings)
@@ -367,7 +393,11 @@ def render(
     )
 
     wav_path = os.path.join(nested_dir, 'music.wav')
-    create_wav_from_events(events_path, wav_path, trailing_silence_in_sec)
+    n_melodic_lines = len(piece.melodic_lines)
+    instruments_registry = create_sinethesizer_instruments(n_melodic_lines)
+    create_wav_from_events(
+        events_path, wav_path, instruments_registry, trailing_silence_in_sec
+    )
 
     lilypond_path = os.path.join(nested_dir, 'sheet_music.ly')
     create_lilypond_file_from_piece(piece, lilypond_path)

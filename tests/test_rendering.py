@@ -15,6 +15,7 @@ from geniartor.rendering import (
     create_events_from_piece,
     create_lilypond_file_from_piece,
     create_midi_from_piece,
+    create_sinethesizer_instruments,
     create_wav_from_events,
 )
 
@@ -467,8 +468,8 @@ def test_create_midi_from_piece(
         (
             [
                 'instrument\tstart_time\tduration\tfrequency\tvelocity\teffects',
-                'lead\t1\t1\tA0\t1\t',
-                'lead\t2\t1\t1\t1\t[{"name": "tremolo", "frequency": 1}]'
+                'sawtooth_with_filter_envelope\t1\t1\tA0\t1\t',
+                'sawtooth_with_filter_envelope\t2\t1\t1\t1\t[{"name": "tremolo", "frequency": 1}]'
             ],
             1.0
         )
@@ -482,6 +483,11 @@ def test_create_wav_from_events(
     with open(path_to_tmp_file, 'w') as tmp_tsv_file:
         for line in tsv_content:
             tmp_tsv_file.write(line + '\n')
+    n_melodic_lines = 1
+    instruments_registry = create_sinethesizer_instruments(n_melodic_lines)
     create_wav_from_events(
-        path_to_tmp_file, path_to_another_tmp_file, trailing_silence_in_seconds
+        path_to_tmp_file,
+        path_to_another_tmp_file,
+        instruments_registry,
+        trailing_silence_in_seconds
     )

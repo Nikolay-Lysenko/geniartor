@@ -133,8 +133,8 @@ rendering:
     velocity: 100
   sinethesizer:
     instruments:
-      - bell_like_bass
-      - lead
-      - lead
-      - lead
+      - plucked_string
+      - sawtooth_with_filter_envelope
+      - sawtooth_with_filter_envelope
+      - sawtooth_with_filter_envelope
     velocity: 1
