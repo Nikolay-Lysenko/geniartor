@@ -26,6 +26,8 @@ from geniartor.rendering import (
         (
             # `piece`
             Piece(
+                tonic='C',
+                scale_type='major',
                 n_measures=2,
                 pitches=[
                     ScaleElement('C4', 39, 23, 1),
@@ -125,6 +127,8 @@ def test_create_events_from_piece(
         (
             # `piece`
             Piece(
+                tonic='C',
+                scale_type='major',
                 n_measures=2,
                 pitches=[
                     ScaleElement('C4', 39, 23, 1),
@@ -188,28 +192,34 @@ def test_create_events_from_piece(
                 ]
             ),
             # `expected`
-            "\\version \"2.18.2\"\n"
-            "\\layout {\n"
-            "    indent = #0\n"
-            "}\n"
-            "\\new StaffGroup <<\n"
-            "    \\new Staff <<\n"
-            "        \\clef treble\n"
-            "        \\time 4/4\n"
-            "        {g'1 c''1}\n"
-            "        \\\\\n"
-            "        {e'1 g'1}\n"
-            "    >>\n"
-            "    \\new Staff <<\n"
-            "        \\clef bass\n"
-            "        \\time 4/4\n"
-            "        {c'2 d'2 e'2 f'2}\n"
-            "    >>\n"
-            ">>"
+            (
+                "\\version \"2.18.2\"\n"
+                "\\layout {\n"
+                "    indent = #0\n"
+                "}\n"
+                "\\new StaffGroup <<\n"
+                "    \\new Staff <<\n"
+                "        \\clef treble\n"
+                "        \\time 4/4\n"
+                "        \\key c \\major\n"
+                "        {g'1 c''1}\n"
+                "        \\\\\n"
+                "        {e'1 g'1}\n"
+                "    >>\n"
+                "    \\new Staff <<\n"
+                "        \\clef bass\n"
+                "        \\time 4/4\n"
+                "        \\key c \\major\n"
+                "        {c'2 d'2 e'2 f'2}\n"
+                "    >>\n"
+                ">>"
+            )
         ),
         (
             # `piece`
             Piece(
+                tonic='C',
+                scale_type='major',
                 n_measures=2,
                 pitches=[
                     ScaleElement('C4', 39, 23, 1),
@@ -278,11 +288,13 @@ def test_create_events_from_piece(
                 "    \\new Staff <<\n"
                 "        \\clef treble\n"
                 "        \\time 4/4\n"
+                "        \\key c \\major\n"
                 "        {g'1 c''1}\n"
                 "    >>\n"
                 "    \\new Staff <<\n"
                 "        \\clef bass\n"
                 "        \\time 4/4\n"
+                "        \\key c \\major\n"
                 "        {c'2 d'2~ d'2 e'4 f'4}\n"
                 "    >>\n"
                 ">>"
@@ -291,6 +303,8 @@ def test_create_events_from_piece(
         (
             # `piece`
             Piece(
+                tonic='C',
+                scale_type='major',
                 n_measures=1,
                 pitches=[
                     ScaleElement('C2', 15, 9, 1),
@@ -338,21 +352,25 @@ def test_create_events_from_piece(
                 ]
             ),
             # `expected`
-            "\\version \"2.18.2\"\n"
-            "\\layout {\n"
-            "    indent = #0\n"
-            "}\n"
-            "\\new StaffGroup <<\n"
-            "    \\new Staff <<\n"
-            "        \\clef treble\n"
-            "        \\time 4/4\n"
-            "        {c,2 d,2 e,2 f,2}\n"
-            "    >>\n"
-            "    \\new Staff <<\n"
-            "        \\clef bass\n"
-            "        \\time 4/4\n"
-            "    >>\n"
-            ">>"
+            (
+                "\\version \"2.18.2\"\n"
+                "\\layout {\n"
+                "    indent = #0\n"
+                "}\n"
+                "\\new StaffGroup <<\n"
+                "    \\new Staff <<\n"
+                "        \\clef treble\n"
+                "        \\time 4/4\n"
+                "        \\key c \\major\n"
+                "        {c,2 d,2 e,2 f,2}\n"
+                "    >>\n"
+                "    \\new Staff <<\n"
+                "        \\clef bass\n"
+                "        \\time 4/4\n"
+                "        \\key c \\major\n"
+                "    >>\n"
+                ">>"
+            )
         ),
     ]
 )
@@ -372,6 +390,8 @@ def test_create_lilypond_file_from_piece(
         (
             # `piece`
             Piece(
+                tonic='C',
+                scale_type='major',
                 n_measures=2,
                 pitches=[
                     ScaleElement('C4', 39, 23, 1),

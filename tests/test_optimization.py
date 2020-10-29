@@ -23,6 +23,8 @@ from geniartor.piece import Piece, PieceElement, ScaleElement, Sonority
         (
             # `piece`
             Piece(
+                tonic='C',
+                scale_type='major',
                 n_measures=2,
                 pitches=[
                     ScaleElement('C4', 39, 23, 1),
@@ -138,6 +140,8 @@ def test_run_variable_neighborhood_search(
         (
             # `piece`
             Piece(
+                tonic='C',
+                scale_type='major',
                 n_measures=2,
                 pitches=[
                     ScaleElement('C4', 39, 23, 1),
@@ -202,6 +206,8 @@ def test_run_variable_neighborhood_search(
             [ScaleElement('B3', 38, 22, 7), ScaleElement('G5', 58, 34, 5)],
             # `expected`
             Piece(
+                tonic='C',
+                scale_type='major',
                 n_measures=2,
                 pitches=[
                     ScaleElement('C4', 39, 23, 1),

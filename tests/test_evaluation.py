@@ -48,6 +48,8 @@ def test_compute_rolling_extrema(
         (
             # `piece`
             Piece(
+                tonic='C',
+                scale_type='major',
                 n_measures=2,
                 pitches=[
                     ScaleElement('C4', 39, 23, 1),
@@ -127,6 +129,8 @@ def test_evaluate_absence_of_large_intervals(
         (
             # `piece`
             Piece(
+                tonic='C',
+                scale_type='major',
                 n_measures=2,
                 pitches=[
                     ScaleElement('C4', 39, 23, 1),
@@ -195,6 +199,8 @@ def test_evaluate_absence_of_large_intervals(
         (
             # `piece`
             Piece(
+                tonic='C',
+                scale_type='major',
                 n_measures=2,
                 pitches=[
                     ScaleElement('C4', 39, 23, 1),
@@ -277,6 +283,8 @@ def test_evaluate_absence_of_narrow_ranges(
         (
             # `piece`
             Piece(
+                tonic='C',
+                scale_type='major',
                 n_measures=2,
                 pitches=[
                     ScaleElement('C4', 39, 23, 1),
@@ -358,6 +366,8 @@ def test_evaluate_absence_of_parallel_intervals(
         (
             # `piece`
             Piece(
+                tonic='C',
+                scale_type='major',
                 n_measures=2,
                 pitches=[
                     ScaleElement('C4', 39, 23, 1),
@@ -435,6 +445,8 @@ def test_evaluate_absence_of_voice_crossing(
         (
             # `piece`
             Piece(
+                tonic='C',
+                scale_type='major',
                 n_measures=2,
                 pitches=[
                     ScaleElement('C4', 39, 23, 1),
@@ -522,6 +534,8 @@ def test_evaluate_conjunct_motion(
         (
             # `piece`
             Piece(
+                tonic='C',
+                scale_type='major',
                 n_measures=2,
                 pitches=[
                     ScaleElement('C4', 39, 23, 1),
@@ -607,6 +621,8 @@ def test_evaluate_dominance_of_tertian_harmony(
         (
             # `piece`
             Piece(
+                tonic='C',
+                scale_type='major',
                 n_measures=2,
                 pitches=[
                     ScaleElement('C4', 39, 23, 1),
@@ -702,6 +718,8 @@ def test_evaluate_harmonic_stability(
         (
             # `piece`
             Piece(
+                tonic='C',
+                scale_type='major',
                 n_measures=2,
                 pitches=[
                     ScaleElement('C4', 39, 23, 1),

@@ -42,6 +42,8 @@ class Sonority(NamedTuple):
 
 class Piece(NamedTuple):
     """A musical piece based on a diatonic scale."""
+    tonic: str
+    scale_type: str
     n_measures: int
     pitches: List[ScaleElement]
     melodic_lines: List[List[PieceElement]]
@@ -458,5 +460,7 @@ def generate_random_piece(
         melodic_line = generate_random_line(line_durations, pitches)
         melodic_lines.append(melodic_line)
     sonorities = find_sonorities(melodic_lines, custom_position_types)
-    piece = Piece(n_measures, pitches, melodic_lines, sonorities)
+    piece = Piece(
+        tonic, scale_type, n_measures, pitches, melodic_lines, sonorities
+    )
     return piece

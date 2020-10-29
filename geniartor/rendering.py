@@ -202,12 +202,16 @@ def create_wav_from_events(
     write_timeline_to_wav(output_path, timeline, settings['frame_rate'])
 
 
-def make_lilypond_template(n_voices: int) -> str:
+def make_lilypond_template(n_voices: int, tonic: str, scale_type: str) -> str:
     """
     Make template of Lilypond text file.
 
     :param n_voices:
         number of voices in a piece to be rendered
+    :param tonic:
+        tonic pitch class represented by letter (like C or A#)
+    :param scale_type:
+        type of scale (e.g., 'major', 'natural_minor', or 'harmonic_minor')
     :return:
         template
     """
@@ -220,19 +224,25 @@ def make_lilypond_template(n_voices: int) -> str:
         "    \\new Staff <<\n"
         "        \\clef treble\n"
         "        \\time 4/4\n"
+        "        \\key {} \\{}\n"
         "{}"
         "    >>\n"
         "    \\new Staff <<\n"
         "        \\clef bass\n"
         "        \\time 4/4\n"
+        "        \\key {} \\{}\n"
         "{}"
         "    >>\n"
         ">>"
     )
+    tonic = tonic.replace('#', 'is').replace('b', 'es').lower()
+    scale_type = scale_type.split('_')[-1]
     voices = ["        {{{}}}\n" for _ in range(n_voices)]
     treble_bass_threshold = ceil(n_voices / 2)
     template = raw_template.format(
+        tonic, scale_type,
         "        \\\\\n".join(voices[:treble_bass_threshold]),
+        tonic, scale_type,
         "        \\\\\n".join(voices[treble_bass_threshold:])
     )
     return template
@@ -319,7 +329,8 @@ def create_lilypond_file_from_piece(piece: Piece, output_path: str) -> None:
     :return:
         None
     """
-    template = make_lilypond_template(len(piece.melodic_lines))
+    n_voices = len(piece.melodic_lines)
+    template = make_lilypond_template(n_voices, piece.tonic, piece.scale_type)
     lilypond_voices = []
     indices = get_lilypond_order_of_voices(len(piece.melodic_lines))
     for index in indices:
