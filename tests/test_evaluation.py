@@ -348,6 +348,63 @@ def test_evaluate_absence_of_narrow_ranges(
             # `expected`
             -0.5 / 3
         ),
+        (
+            # `piece`
+            Piece(
+                tonic='C',
+                scale_type='major',
+                n_measures=1,
+                pitches=[
+                    ScaleElement('C4', 39, 23, 1),
+                    ScaleElement('D4', 41, 24, 2),
+                    ScaleElement('E4', 43, 25, 3),
+                    ScaleElement('F4', 44, 26, 4),
+                    ScaleElement('G4', 46, 27, 5),
+                    ScaleElement('A4', 48, 28, 6),
+                    ScaleElement('B4', 50, 29, 7),
+                    ScaleElement('C5', 51, 30, 1),
+                    ScaleElement('D5', 53, 31, 2),
+                ],
+                melodic_lines=[
+                    [
+                        PieceElement('C4', 39, 23, 1, 0.0, 0.5),
+                        PieceElement('D4', 41, 24, 2, 0.5, 0.5),
+                    ],
+                    [
+                        PieceElement('F4', 44, 26, 4, 0.0, 0.5),
+                        PieceElement('E4', 43, 25, 3, 0.5, 0.5),
+                    ],
+                    [
+                        PieceElement('C5', 51, 30, 1, 0.0, 0.5),
+                        PieceElement('D5', 53, 31, 2, 0.5, 0.5),
+                    ],
+                ],
+                sonorities=[
+                    Sonority(
+                        [
+                            PieceElement('C4', 39, 23, 1, 0.0, 0.5),
+                            PieceElement('F4', 44, 26, 4, 0.0, 0.5),
+                            PieceElement('C5', 51, 30, 1, 0.0, 0.5),
+                        ],
+                        [0, 0, 0],
+                        'beginning'
+                    ),
+                    Sonority(
+                        [
+                            PieceElement('D4', 41, 24, 2, 0.5, 0.5),
+                            PieceElement('E4', 43, 25, 3, 0.5, 0.5),
+                            PieceElement('D5', 53, 31, 2, 0.5, 0.5),
+                        ],
+                        [-1, -1, -1],
+                        'ending'
+                    ),
+                ]
+            ),
+            # `n_degrees_to_penalty`
+            {4: 0.5, 7: 1.0},
+            # `expected`
+            -1.0
+        ),
     ]
 )
 def test_evaluate_absence_of_parallel_intervals(

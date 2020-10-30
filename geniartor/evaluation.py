@@ -105,11 +105,9 @@ def evaluate_absence_of_parallel_intervals(
     intervals = []
     for sonority in piece.sonorities:
         current_intervals = []
-        zipped = zip(
-            sonority.indices, sonority.indices[1:],
-            sonority.elements, sonority.elements[1:]
-        )
-        for lower_index, upper_index, lower_element, upper_element in zipped:
+        zipped = zip(sonority.indices, sonority.elements)
+        combined = combinations(zipped, 2)
+        for (lower_index, lower_element), (upper_index, upper_element) in combined:
             n_degrees = (
                 upper_element.position_in_degrees
                 - lower_element.position_in_degrees
