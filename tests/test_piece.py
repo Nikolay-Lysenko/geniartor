@@ -239,6 +239,48 @@ def test_create_diatonic_scale(
                 ),
             ]
         ),
+        (
+            # `melodic_lines`
+            [
+                [
+                    PieceElement('C4', 39, 23, 1, 0.0, 0.5),
+                    PieceElement('C4', 39, 23, 1, 0.5, 0.25),
+                    PieceElement('C4', 39, 23, 1, 0.75, 0.25),
+                ],
+                [
+                    PieceElement('C4', 39, 23, 1, 0.0, 1.0),
+                ],
+            ],
+            # `custom_position_types`
+            None,
+            # `expected`
+            [
+                Sonority(
+                    [
+                        PieceElement('C4', 39, 23, 1, 0.0, 0.5),
+                        PieceElement('C4', 39, 23, 1, 0.0, 1.0),
+                    ],
+                    [0, 0],
+                    'beginning'
+                ),
+                Sonority(
+                    [
+                        PieceElement('C4', 39, 23, 1, 0.5, 0.25),
+                        PieceElement('C4', 39, 23, 1, 0.0, 1.0),
+                    ],
+                    [1, 0],
+                    'middle'
+                ),
+                Sonority(
+                    [
+                        PieceElement('C4', 39, 23, 1, 0.75, 0.25),
+                        PieceElement('C4', 39, 23, 1, 0.0, 1.0),
+                    ],
+                    [-1, -1],
+                    'ending'
+                ),
+            ]
+        ),
     ]
 )
 def test_find_sonorities(

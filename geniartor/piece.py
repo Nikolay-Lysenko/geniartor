@@ -361,8 +361,9 @@ def find_sonorities(
     :return:
         all simultaneously sounding pitches found in a piece
     """
+    end_time = 1e5
     all_lines_start_times = [
-        [x.start_time for x in melodic_line]
+        [x.start_time for x in melodic_line] + [end_time]
         for melodic_line in melodic_lines
     ]
     flat_start_times = [
@@ -380,7 +381,7 @@ def find_sonorities(
     sonorities = [initial_sonority]
     custom_position_types = custom_position_types or {}
     core_position_types = {0.0: 'downbeat', 0.5: 'middle'}
-    for start_time in unique_start_times[1:-1]:
+    for start_time in unique_start_times[1:-2]:
         position_type = custom_position_types.get(
             start_time,
             core_position_types.get(start_time - floor(start_time), 'other')
