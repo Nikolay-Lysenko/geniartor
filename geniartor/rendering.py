@@ -32,8 +32,8 @@ def create_midi_from_piece(
         measure_in_seconds: float,
         instruments: List[int],
         velocity: int,
-        opening_silence_in_seconds: int = 1,
-        trailing_silence_in_seconds: int = 1
+        opening_silence_in_seconds: float = 1.0,
+        trailing_silence_in_seconds: float = 1.0
 ) -> None:
     """
     Create MIDI file from a piece created by this package.
@@ -98,7 +98,7 @@ def create_events_from_piece(
         instruments: List[str],
         velocity: float,
         effects: str = '',
-        opening_silence_in_seconds: int = 1
+        opening_silence_in_seconds: float = 1.0
 ) -> None:
     """
     Create TSV file with `sinethesizer` events from a piece.
@@ -114,7 +114,7 @@ def create_events_from_piece(
     :param velocity:
         one common velocity for all notes
     :param effects:
-        sound effects to be applied to the resulting event
+        sound effects (as JSON string) that are applied to all piece events
     :param opening_silence_in_seconds:
         number of seconds with silence to add at the start of the composition
     :return:
@@ -122,14 +122,20 @@ def create_events_from_piece(
     """
     all_notes = get_list_of_notes()
     events = []
-    for melodic_line, timbre in zip(piece.melodic_lines, instruments):
+    for melodic_line, instrument in zip(piece.melodic_lines, instruments):
         for element in melodic_line:
             start_time = element.start_time * measure_in_seconds
             start_time += opening_silence_in_seconds
             duration_in_seconds = element.duration * measure_in_seconds
             pitch_id = element.position_in_semitones
             note = all_notes[pitch_id]
-            event = (timbre, start_time, duration_in_seconds, note, pitch_id)
+            event = (
+                instrument,
+                start_time,
+                duration_in_seconds,
+                note,
+                pitch_id
+            )
             events.append(event)
     events = sorted(events, key=lambda x: (x[1], x[4], x[2]))
     events = [
@@ -138,8 +144,12 @@ def create_events_from_piece(
     ]
 
     columns = [
-        'instrument', 'start_time', 'duration', 'frequency',
-        'velocity', 'effects'
+        'instrument',
+        'start_time',
+        'duration',
+        'frequency',
+        'velocity',
+        'effects'
     ]
     header = '\t'.join(columns)
     results = [header] + events
@@ -332,7 +342,7 @@ def create_lilypond_file_from_piece(piece: Piece, output_path: str) -> None:
     n_voices = len(piece.melodic_lines)
     template = make_lilypond_template(n_voices, piece.tonic, piece.scale_type)
     lilypond_voices = []
-    indices = get_lilypond_order_of_voices(len(piece.melodic_lines))
+    indices = get_lilypond_order_of_voices(n_voices)
     for index in indices:
         melodic_line = piece.melodic_lines[index]
         lilypond_voice = []
