@@ -216,8 +216,8 @@ def test_evaluate_absence_of_large_intervals(
                     [
                         PieceElement('C4', 39, 23, 1, 0.0, 0.5),
                         PieceElement('D4', 41, 24, 2, 0.5, 0.5),
-                        PieceElement('C4', 39, 23, 1, 0.0, 0.5),
-                        PieceElement('D4', 41, 24, 2, 0.5, 0.5),
+                        PieceElement('C4', 39, 23, 1, 1.0, 0.5),
+                        PieceElement('D4', 41, 24, 2, 1.5, 0.5),
                     ],
                     [
                         PieceElement('G4', 46, 27, 5, 0.0, 1.0),
@@ -243,7 +243,7 @@ def test_evaluate_absence_of_large_intervals(
                     ),
                     Sonority(
                         [
-                            PieceElement('C4', 39, 23, 1, 0.0, 0.5),
+                            PieceElement('C4', 39, 23, 1, 1.0, 0.5),
                             PieceElement('C5', 51, 30, 1, 1.0, 1.0),
                         ],
                         [2, 1],
@@ -251,7 +251,7 @@ def test_evaluate_absence_of_large_intervals(
                     ),
                     Sonority(
                         [
-                            PieceElement('D4', 41, 24, 2, 0.5, 0.5),
+                            PieceElement('D4', 41, 24, 2, 1.5, 0.5),
                             PieceElement('C5', 51, 30, 1, 1.0, 1.0),
                         ],
                         [-1, -1],
@@ -612,8 +612,8 @@ def test_evaluate_conjunct_motion(
                         PieceElement('F4', 44, 26, 4, 1.5, 0.5),
                     ],
                     [
-                        PieceElement('E4', 43, 25, 3, 1.0, 1.0),
-                        PieceElement('G4', 46, 27, 5, 0.0, 1.0),
+                        PieceElement('E4', 43, 25, 3, 0.0, 1.0),
+                        PieceElement('G4', 46, 27, 5, 1.0, 1.0),
                     ],
                     [
                         PieceElement('G4', 46, 27, 5, 0.0, 1.0),
@@ -624,7 +624,7 @@ def test_evaluate_conjunct_motion(
                     Sonority(
                         [
                             PieceElement('C4', 39, 23, 1, 0.0, 0.5),
-                            PieceElement('E4', 43, 25, 3, 1.0, 1.0),
+                            PieceElement('E4', 43, 25, 3, 0.0, 1.0),
                             PieceElement('G4', 46, 27, 5, 0.0, 1.0),
                         ],
                         [0, 0, 0],
@@ -633,7 +633,7 @@ def test_evaluate_conjunct_motion(
                     Sonority(
                         [
                             PieceElement('D4', 41, 24, 2, 0.5, 0.5),
-                            PieceElement('E4', 43, 25, 3, 1.0, 1.0),
+                            PieceElement('E4', 43, 25, 3, 0.0, 1.0),
                             PieceElement('G4', 46, 27, 5, 0.0, 1.0),
                         ],
                         [1, 0, 0],
@@ -642,7 +642,7 @@ def test_evaluate_conjunct_motion(
                     Sonority(
                         [
                             PieceElement('E4', 43, 25, 3, 1.0, 0.5),
-                            PieceElement('G4', 46, 27, 5, 0.0, 1.0),
+                            PieceElement('G4', 46, 27, 5, 1.0, 1.0),
                             PieceElement('C5', 51, 30, 1, 1.0, 1.0),
                         ],
                         [2, 1, 1],
@@ -651,7 +651,7 @@ def test_evaluate_conjunct_motion(
                     Sonority(
                         [
                             PieceElement('F4', 44, 26, 4, 1.5, 0.5),
-                            PieceElement('G4', 46, 27, 5, 0.0, 1.0),
+                            PieceElement('G4', 46, 27, 5, 1.0, 1.0),
                             PieceElement('C5', 51, 30, 1, 1.0, 1.0),
                         ],
                         [-1, -1, -1],

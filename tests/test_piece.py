@@ -47,7 +47,7 @@ def test_create_diatonic_scale(
         tonic: str, scale_type: str, n_elements_to_take: int,
         expected: List[Tuple[int, int]]
 ) -> None:
-    """Test that `elements` attribute is properly filled."""
+    """Test `create_diatonic_scale` function."""
     scale = create_diatonic_scale(tonic, scale_type)
     result = [
         (x.position_in_semitones, x.degree)
