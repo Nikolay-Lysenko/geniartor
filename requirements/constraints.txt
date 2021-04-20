@@ -11,7 +11,7 @@ numpy==1.18.5
 packaging==20.4
 pluggy==0.13.1
 pretty-midi==0.2.9
-py==1.8.2
+py==1.10.0
 pyparsing==2.4.7
 pytest==5.4.3
 pytest-cov==2.10.0
