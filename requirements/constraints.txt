@@ -20,6 +20,6 @@ requests==2.24.0
 scipy==1.4.1
 sinethesizer==0.5.0
 six==1.15.0
-urllib3==1.25.9
+urllib3==1.26.5
 wcwidth==0.2.5
 zipp==3.1.0
