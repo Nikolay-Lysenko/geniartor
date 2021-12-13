@@ -107,7 +107,7 @@ optimization:
   perturbation_probability: 0.3
 
 rendering:
-  dir: geniartor_data
+  dir: outputs
   common:
     measure_in_seconds: 2.0
     opening_silence_in_seconds: 1.0
@@ -121,8 +121,8 @@ rendering:
     velocity: 100
   sinethesizer:
     instruments:
-      - plucked_string
-      - sawtooth_with_filter_envelope
-      - sawtooth_with_filter_envelope
-      - sawtooth_with_filter_envelope
-    velocity: 1.0
+      - brass
+      - woodwind
+      - bowed_string
+      - woodwind
+    velocity: 0.8

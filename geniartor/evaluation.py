@@ -163,7 +163,7 @@ def evaluate_conjunct_motion(
     Evaluate presence of coherent melodic lines that move almost without leaps.
 
     :param piece:
-        `musical piece
+        musical piece
     :param penalty_deduction_per_line:
         amount of leaps penalty that is deducted for each melodic line
     :param n_semitones_to_penalty:

@@ -158,29 +158,19 @@ def create_events_from_piece(
             out_file.write(line + '\n')
 
 
-def create_sinethesizer_instruments(
-        n_melodic_lines: int
-) -> Dict[str, Instrument]:
+def create_sinethesizer_instruments() -> Dict[str, Instrument]:
     """
-    Create registry of `sinethesizer` instruments with adjusted amplitudes.
+    Create registry of `sinethesizer` instruments.
 
-    :param n_melodic_lines:
-        number of melodic lines in a piece
     :return:
         mapping from instrument names to instruments itself
     """
     presets_path = resource_filename(
-        'geniartor', 'configs/sinethesizer_presets.yml'
+        'geniartor',
+        'configs/sinethesizer_presets.yml'
     )
     instruments_registry = create_instruments_registry(presets_path)
-    normalized_registry = {}
-    for name, instrument in instruments_registry.items():
-        amplitude_scaling = instrument.amplitude_scaling
-        amplitude_scaling /= n_melodic_lines
-        normalized_registry[name] = Instrument(
-            instrument.partials, amplitude_scaling, instrument.effects
-        )
-    return normalized_registry
+    return instruments_registry
 
 
 def create_wav_from_events(
@@ -205,6 +195,7 @@ def create_wav_from_events(
     settings = {
         'frame_rate': 48000,
         'trailing_silence': trailing_silence_in_seconds,
+        'peak_amplitude': 1,
         'instruments_registry': instruments_registry,
     }
     events = convert_tsv_to_events(events_path, settings)
@@ -414,8 +405,7 @@ def render(
     )
 
     wav_path = os.path.join(nested_dir, 'music.wav')
-    n_melodic_lines = len(piece.melodic_lines)
-    instruments_registry = create_sinethesizer_instruments(n_melodic_lines)
+    instruments_registry = create_sinethesizer_instruments()
     create_wav_from_events(
         events_path, wav_path, instruments_registry, trailing_silence_in_sec
     )

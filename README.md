@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/Nikolay-Lysenko/geniartor.svg?branch=master)](https://travis-ci.org/Nikolay-Lysenko/geniartor)
+[![Build Status](https://github.com/Nikolay-Lysenko/geniartor/actions/workflows/main.yml/badge.svg)](https://github.com/Nikolay-Lysenko/geniartor/actions/workflows/main.yml)
 [![codecov](https://codecov.io/gh/Nikolay-Lysenko/geniartor/branch/master/graph/badge.svg)](https://codecov.io/gh/Nikolay-Lysenko/geniartor)
 [![Maintainability](https://api.codeclimate.com/v1/badges/a5131738e1b284fab9f9/maintainability)](https://codeclimate.com/github/Nikolay-Lysenko/geniartor/maintainability)
 [![PyPI version](https://badge.fury.io/py/geniartor.svg)](https://badge.fury.io/py/geniartor)

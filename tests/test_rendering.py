@@ -488,8 +488,8 @@ def test_create_midi_from_piece(
         (
             [
                 'instrument\tstart_time\tduration\tfrequency\tvelocity\teffects',
-                'sawtooth_with_filter_envelope\t1\t1\tA0\t1\t',
-                'sawtooth_with_filter_envelope\t2\t1\t1\t1\t[{"name": "tremolo", "frequency": 1}]'
+                'woodwind\t1\t1\tA0\t1\t',
+                'woodwind\t2\t1\t27.5\t1\t[{"name": "tremolo", "frequency": 1}]'
             ],
             1.0
         )
@@ -503,8 +503,7 @@ def test_create_wav_from_events(
     with open(path_to_tmp_file, 'w') as tmp_tsv_file:
         for line in tsv_content:
             tmp_tsv_file.write(line + '\n')
-    n_melodic_lines = 1
-    instruments_registry = create_sinethesizer_instruments(n_melodic_lines)
+    instruments_registry = create_sinethesizer_instruments()
     create_wav_from_events(
         path_to_tmp_file,
         path_to_another_tmp_file,
